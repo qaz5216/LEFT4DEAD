@@ -18,7 +18,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -26,25 +26,38 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void MoveForward(float Value);
+		void MoveForward(float Value);
 
 	// 좌우 이동 처리
 	UFUNCTION()
-	void MoveRight(float Value);
-
+		void MoveRight(float Value);
+	//점프
 	UFUNCTION()
-	void StartJump();
+		void StartJump();
+
+	//발사
+	UFUNCTION()
+		void Fire();
 
 	// 좌우 이동 처리
 	UFUNCTION()
-	void StopJump();
+		void StopJump();
 
 	//FPS카메라
 	UPROPERTY(VisibleAnywhere)
-	class UCameraComponent* FPSCameraComponent;
+		class UCameraComponent* FPSCameraComponent;
 
-	// 일인칭 메시 (팔), 소유 플레이어에게만 보입니다.
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* FPSMesh;
+	// 일인칭 메시 (왼팔)
+	UPROPERTY(EditAnywhere, Category = Mesh)
+		UStaticMeshComponent* LeftMesh;
+	// 일인칭 메시 (오른팔)
+	UPROPERTY(EditAnywhere, Category = Mesh)
+		UStaticMeshComponent* RightMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		FVector MuzzleOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AFPSProjectile> ProjectileClass;
 
 };

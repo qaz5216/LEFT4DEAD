@@ -2,6 +2,7 @@
 
 #include "FPSCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "FPSProjectile.h"
 #include "GameFramework/Character.h"
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -20,15 +21,23 @@ AFPSCharacter::AFPSCharacter()
     FPSCameraComponent->bUsePawnControlRotation = true;
 	
 	// 일인칭 메시 컴포넌트입니다.
-	FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
+	LeftMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftMesh"));
 	// 소유 플레이어만 이 메시를 볼 수 있습니다.
-	FPSMesh->SetOnlyOwnerSee(true);
+	LeftMesh->SetOnlyOwnerSee(true);
 	// FPS 메시를 FPS 카메라에 붙입니다.
-	FPSMesh->SetupAttachment(FPSCameraComponent);
+	LeftMesh->SetupAttachment(FPSCameraComponent);
 	// 일부 환경 섀도잉을 꺼 메시가 하나인 듯 보이는 느낌을 유지합니다.
-	FPSMesh->bCastDynamicShadow = false;
-	FPSMesh->CastShadow = false;
+	LeftMesh->bCastDynamicShadow = false;
+	LeftMesh->CastShadow = false;
 
+	RightMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightMesh"));
+	// 소유 플레이어만 이 메시를 볼 수 있습니다.
+	RightMesh->SetOnlyOwnerSee(true);
+	// FPS 메시를 FPS 카메라에 붙입니다.
+	RightMesh->SetupAttachment(FPSCameraComponent);
+	// 일부 환경 섀도잉을 꺼 메시가 하나인 듯 보이는 느낌을 유지합니다.
+	RightMesh->bCastDynamicShadow = false;
+	RightMesh->CastShadow = false;
 	GetMesh()->SetOwnerNoSee(true);
 
 }
@@ -63,10 +72,12 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//Look바인딩 구성
 	PlayerInputComponent->BindAxis("Turn", this, &AFPSCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AFPSCharacter::AddControllerPitchInput);
-
+	
 	//"action"바인딩 구성
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::Fire);
 }
 
 void AFPSCharacter::MoveForward(float Value)
@@ -90,4 +101,40 @@ void AFPSCharacter::StartJump()
 void AFPSCharacter::StopJump()
 {
 	bPressedJump = false;
+}
+
+void AFPSCharacter::Fire()
+{
+	UE_LOG(LogTemp, Log, TEXT("Hi"));
+	if (ProjectileClass)
+	{
+		//카메라 트랜스폼 구하기
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+		//MuzzleOffset 을 카메라 스페이스에서 월드 스페이스로 변환
+		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
+		FRotator MuzzleRotation = CameraRotation;
+		//조준을 약간 윗쪽으로 올려줍니다.
+		MuzzleRotation.Pitch += 10.0f;
+		UWorld* World = GetWorld();
+		UE_LOG(LogTemp, Log, TEXT("Hello"));
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+			// 총구 위치에 발사체를 스폰시킵니다.
+			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+			if (Projectile)
+			{
+				//발사방향 알아내기
+				FVector LaunchDirection = MuzzleRotation.Vector();
+				Projectile->FireInDirection(LaunchDirection);
+				// 총알수명 3초로 정해주기
+				Projectile->SetLifeSpan(3.0f);
+			}
+		}
+	}
 }
