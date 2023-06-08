@@ -19,9 +19,10 @@ AFPSCharacter::AFPSCharacter()
     FPSCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
     // 폰의 로테이션 제어를 허가합니다.
     FPSCameraComponent->bUsePawnControlRotation = true;
-	
+	// 소켓메쉬 입니다.
+	SocketMesh = CreateDefaultSubobject<USkeletalMeshSocket>(TEXT("SocketMesh"));
 	// 일인칭 메시 컴포넌트입니다.
-	LeftMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftMesh"));
+	LeftMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftMesh"));
 	// 소유 플레이어만 이 메시를 볼 수 있습니다.
 	LeftMesh->SetOnlyOwnerSee(true);
 	// FPS 메시를 FPS 카메라에 붙입니다.
@@ -29,8 +30,9 @@ AFPSCharacter::AFPSCharacter()
 	// 일부 환경 섀도잉을 꺼 메시가 하나인 듯 보이는 느낌을 유지합니다.
 	LeftMesh->bCastDynamicShadow = false;
 	LeftMesh->CastShadow = false;
-
-	RightMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightMesh"));
+	LeftMesh->SetRelativeLocation(FVector(90.0f, -40.0f, -60.0f));
+	RightMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightMesh"));
+	RightMesh->SkeletalMesh->AddSocket(SocketMesh);
 	// 소유 플레이어만 이 메시를 볼 수 있습니다.
 	RightMesh->SetOnlyOwnerSee(true);
 	// FPS 메시를 FPS 카메라에 붙입니다.
@@ -39,7 +41,19 @@ AFPSCharacter::AFPSCharacter()
 	RightMesh->bCastDynamicShadow = false;
 	RightMesh->CastShadow = false;
 	GetMesh()->SetOwnerNoSee(true);
-
+	RightMesh->SetRelativeLocation(FVector(90.0f, 40.0f, -60.0f));
+	
+	//처음 웨폰 1
+	WeaponNum = 1;
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMesh->SetupAttachment(RightMesh);
+	WeaponMesh->bCastDynamicShadow = false;
+	WeaponMesh->CastShadow = false;
+	WeaponMesh->SetRelativeLocation(FVector(90.0f, 40.0f, 100.0f));
+	Weapon1bullet = 30;
+	Weapon2bullet = 10;
+	Weapon3bullet = 3;
+	HP = 100;
 }
 
 // Called when the game starts or when spawned
@@ -76,8 +90,14 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//"action"바인딩 구성
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
-
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::Fire);
+	//발사
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::FireCheck);
+	//총스위칭
+	PlayerInputComponent->BindAction("Switch1", IE_Pressed, this, &AFPSCharacter::Switch1);
+	PlayerInputComponent->BindAction("Switch2", IE_Pressed, this, &AFPSCharacter::Switch2);
+	PlayerInputComponent->BindAction("Switch3", IE_Pressed, this, &AFPSCharacter::Switch3);
+	//재장전
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSCharacter::Reload);
 }
 
 void AFPSCharacter::MoveForward(float Value)
@@ -105,10 +125,11 @@ void AFPSCharacter::StopJump()
 
 void AFPSCharacter::Fire()
 {
-	UE_LOG(LogTemp, Log, TEXT("Hi"));
+	
 	if (ProjectileClass)
 	{
 		//카메라 트랜스폼 구하기
+
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
@@ -116,10 +137,11 @@ void AFPSCharacter::Fire()
 		//MuzzleOffset 을 카메라 스페이스에서 월드 스페이스로 변환
 		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
 		FRotator MuzzleRotation = CameraRotation;
-		//조준을 약간 윗쪽으로 올려줍니다.
-		MuzzleRotation.Pitch += 10.0f;
+		//조준을 약간 윗쪽으로 올려줍니다.//안올림
+		MuzzleRotation.Pitch += 0.0f;
+		// 총알 발사를 위로 좀 올림
+		MuzzleLocation.Z += 50.0f;
 		UWorld* World = GetWorld();
-		UE_LOG(LogTemp, Log, TEXT("Hello"));
 		if (World)
 		{
 			FActorSpawnParameters SpawnParams;
@@ -128,13 +150,127 @@ void AFPSCharacter::Fire()
 			// 총구 위치에 발사체를 스폰시킵니다.
 			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
 			if (Projectile)
-			{
-				//발사방향 알아내기
-				FVector LaunchDirection = MuzzleRotation.Vector();
-				Projectile->FireInDirection(LaunchDirection);
-				// 총알수명 3초로 정해주기
-				Projectile->SetLifeSpan(3.0f);
+			{	
+				//총에 따른 발사
+				if (WeaponNum == 1) {
+					//발사방향 알아내기
+					FVector LaunchDirection = MuzzleRotation.Vector();
+					Projectile->FireInDirection(LaunchDirection);
+					// 총알수명 3초로 정해주기
+					Projectile->SetLifeSpan(3.0f);
+					Projectile->ProjectileMovementComponent->InitialSpeed = 30000.0f;
+					Projectile->ProjectileMovementComponent->MaxSpeed = 30000.0f;
+					Weapon1bullet--;
+					UE_LOG(LogTemp, Log, TEXT("%d"), Weapon1bullet);
+				}
+				else if(WeaponNum == 2) {
+					//발사방향 알아내기
+					FVector LaunchDirection = MuzzleRotation.Vector();
+					Projectile->FireInDirection(LaunchDirection);
+					// 총알수명 3초로 정해주기
+					Projectile->SetLifeSpan(3.0f);
+					Projectile->ProjectileMovementComponent->InitialSpeed = 3000.0f;
+					Projectile->ProjectileMovementComponent->MaxSpeed = 3000.0f;
+					Weapon2bullet--;
+					UE_LOG(LogTemp, Log, TEXT("%d"), Weapon2bullet);
+				}
+				else if(WeaponNum == 3) {
+					//발사방향 알아내기
+					FVector LaunchDirection = MuzzleRotation.Vector();
+					Projectile->FireInDirection(LaunchDirection);
+					// 총알수명 3초로 정해주기
+					Projectile->SetLifeSpan(3.0f);
+					Projectile->ProjectileMovementComponent->InitialSpeed = 300.0f;
+					Projectile->ProjectileMovementComponent->MaxSpeed = 300.0f;
+					Weapon3bullet--;
+					UE_LOG(LogTemp, Log, TEXT("%d"), Weapon3bullet);
+				}
 			}
 		}
+	}
+}
+
+void AFPSCharacter::Switch1()
+{
+	if (WeaponNum != 1) 
+	{
+		WeaponNum = 1;
+		WeaponMesh->SetRelativeScale3D(FVector(1.0f,1.0f,1.0f));
+		WeaponMesh->SetRelativeLocation(FVector(90.0f, 40.0f, 100.0f));
+	}
+}
+void AFPSCharacter::Switch2()
+{
+	if (WeaponNum != 2)
+	{
+		WeaponNum = 2;
+		WeaponMesh->SetRelativeScale3D(FVector(0.5f, 1.0f, 1.0f));
+		WeaponMesh->SetRelativeLocation(FVector(70.0f, 40.0f, 100.0f));
+	}
+}
+void AFPSCharacter::Switch3()
+{
+	if (WeaponNum != 3)
+	{
+		WeaponNum = 3;
+		WeaponMesh->SetRelativeScale3D(FVector(0.25f, 1.0f, 1.0f));
+		WeaponMesh->SetRelativeLocation(FVector(60.0f, 40.0f, 100.0f));
+	}
+
+}
+void AFPSCharacter::Reload()
+{
+	if (WeaponNum == 1)
+	{
+		Weapon1bullet = 30;
+	}
+	else if (WeaponNum == 2)
+	{
+		Weapon2bullet = 10;
+	}
+	else if (WeaponNum == 3)
+	{
+		Weapon3bullet = 3;
+	}
+}
+
+void AFPSCharacter::FireCheck()
+{
+	if (WeaponNum == 1)
+	{
+		if (Weapon1bullet > 0)
+			Fire();
+		else {
+			UE_LOG(LogTemp, Log, TEXT("Reload plz"));
+		}
+	}
+	else if (WeaponNum == 2)
+	{
+		if (Weapon2bullet > 0)
+			Fire();
+		else {
+			UE_LOG(LogTemp, Log, TEXT("Reload plz"));
+		}
+	}
+	else if (WeaponNum == 3)
+	{
+		if (Weapon3bullet > 0)
+			Fire();
+		else {
+			UE_LOG(LogTemp, Log, TEXT("Reload plz"));
+		}
+	}
+}
+void AFPSCharacter::Attacked(int32 damage)
+{
+	HP -= damage;
+}
+
+void AFPSCharacter::Heal(int32 healing)
+{
+	if (HP + healing >= 100)
+		HP = 100;
+	else {
+		HP += healing;
 	}
 }

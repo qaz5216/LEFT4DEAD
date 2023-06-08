@@ -12,18 +12,19 @@ AFPSProjectile::AFPSProjectile()
 	//구체를 단순 콜리전 표현으로 사용합니다.
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	//구체 콜리전 반경 설정
-	CollisionComponent->InitSphereRadius(15.0f);
+	CollisionComponent->InitSphereRadius(5.0f);
 	//루트 컴포넌트를 콜리전 컴포넌트로 설정.
 	RootComponent = CollisionComponent;
 
 	//ProjectileMovementComponent 를 사용하여 발사체의 운동을 관리
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->SetUpdatedComponent(CollisionComponent);
-	ProjectileMovementComponent->InitialSpeed = 3000.0f;
-	ProjectileMovementComponent->MaxSpeed = 3000.0f;
+	ProjectileMovementComponent->InitialSpeed = 30000.0f;
+	ProjectileMovementComponent->MaxSpeed = 30000.0f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Bounciness = 0.3f;
+	ProjectileMovementComponent->ProjectileGravityScale = 0;
 	//3초만 살아있음
 	CollisionComponent->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
 
