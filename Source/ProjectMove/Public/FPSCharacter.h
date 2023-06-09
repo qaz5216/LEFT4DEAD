@@ -57,10 +57,10 @@ public:
 	UFUNCTION()
 		void Reload();
 	//공격받았을때
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Useable")
 		void Attacked(int32 damage);
 	//체력회복
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Useable")
 		void Heal(int32 healing);
 	//FPS카메라
 	UPROPERTY(VisibleAnywhere)
@@ -97,6 +97,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 		int32 Weapon3bullet;
 	//HP
-	UPROPERTY(EditAnywhere, Category = Weapon)
+	UPROPERTY(BlueprintReadWrite, Category = Useable)
 		int32 HP;
 };
