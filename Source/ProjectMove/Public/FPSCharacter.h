@@ -45,7 +45,8 @@ public:
 	//¹ß»çÀåÅº¼ö Ã¼Å©
 	UFUNCTION()
 		void FireCheck();
-
+	UFUNCTION()
+		void FireStop();
 	//ÃÑ ½ºÀ§Äª
 	UFUNCTION()
 		void Switch1();
@@ -84,19 +85,32 @@ public:
 		USkeletalMeshSocket* SocketMesh;
 
 	// ¹«±â½ºÀ§Ä¡³Ñ¹ö
-	UPROPERTY(EditAnywhere, Category = Weapon)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = Weapon)
 		int32 WeaponNum;
+	//ÀåÅº¼ö
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = Weapon)
+		int32 Ammo;
+	//ÀÜÅº¼ö
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = Weapon)
+		int32 Leftammo;
 	//¹«±â
 	UPROPERTY(EditAnywhere, Category = Mesh)
 		UStaticMeshComponent* WeaponMesh;
 	//ÃÑ¾Ë
-	UPROPERTY(EditAnywhere, Category = Weapon)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = Weapon)
 		int32 Weapon1bullet;
-	UPROPERTY(EditAnywhere, Category = Weapon)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		int32 Weapon2bullet;
-	UPROPERTY(EditAnywhere, Category = Weapon)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		int32 Weapon3bullet;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool firing;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float currentTime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float firetime;
 	//HP
 	UPROPERTY(BlueprintReadWrite, Category = Useable)
 		int32 HP;
+
 };

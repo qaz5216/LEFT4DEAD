@@ -50,10 +50,15 @@ AFPSCharacter::AFPSCharacter()
 	WeaponMesh->bCastDynamicShadow = false;
 	WeaponMesh->CastShadow = false;
 	WeaponMesh->SetRelativeLocation(FVector(90.0f, 40.0f, 100.0f));
+	Ammo = 30;
+	Leftammo = 30;
 	Weapon1bullet = 30;
 	Weapon2bullet = 10;
 	Weapon3bullet = 3;
 	HP = 100;
+	firing = false;
+	currentTime = 0;
+	firetime = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -71,7 +76,16 @@ void AFPSCharacter::BeginPlay()
 void AFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (firing) {
+		currentTime += DeltaTime;
+		if (currentTime >= firetime) {
+			UE_LOG(LogTemp, Log, TEXT("currenttime=%f"), currentTime);
+			if (Weapon1bullet > 0) {
+				Fire();
+			}
+			currentTime = 0;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -86,12 +100,12 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//Look바인딩 구성
 	PlayerInputComponent->BindAxis("Turn", this, &AFPSCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AFPSCharacter::AddControllerPitchInput);
-	
 	//"action"바인딩 구성
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
 	//발사
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::FireCheck);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSCharacter::FireStop);
 	//총스위칭
 	PlayerInputComponent->BindAction("Switch1", IE_Pressed, this, &AFPSCharacter::Switch1);
 	PlayerInputComponent->BindAction("Switch2", IE_Pressed, this, &AFPSCharacter::Switch2);
@@ -161,6 +175,7 @@ void AFPSCharacter::Fire()
 					Projectile->ProjectileMovementComponent->InitialSpeed = 30000.0f;
 					Projectile->ProjectileMovementComponent->MaxSpeed = 30000.0f;
 					Weapon1bullet--;
+					Leftammo = Weapon1bullet;
 					UE_LOG(LogTemp, Log, TEXT("%d"), Weapon1bullet);
 				}
 				else if(WeaponNum == 2) {
@@ -172,6 +187,8 @@ void AFPSCharacter::Fire()
 					Projectile->ProjectileMovementComponent->InitialSpeed = 3000.0f;
 					Projectile->ProjectileMovementComponent->MaxSpeed = 3000.0f;
 					Weapon2bullet--;
+
+					Leftammo = Weapon2bullet;
 					UE_LOG(LogTemp, Log, TEXT("%d"), Weapon2bullet);
 				}
 				else if(WeaponNum == 3) {
@@ -183,6 +200,8 @@ void AFPSCharacter::Fire()
 					Projectile->ProjectileMovementComponent->InitialSpeed = 300.0f;
 					Projectile->ProjectileMovementComponent->MaxSpeed = 300.0f;
 					Weapon3bullet--;
+
+					Leftammo = Weapon3bullet;
 					UE_LOG(LogTemp, Log, TEXT("%d"), Weapon3bullet);
 				}
 			}
@@ -197,24 +216,32 @@ void AFPSCharacter::Switch1()
 		WeaponNum = 1;
 		WeaponMesh->SetRelativeScale3D(FVector(1.0f,1.0f,1.0f));
 		WeaponMesh->SetRelativeLocation(FVector(90.0f, 40.0f, 100.0f));
+		Ammo = 30;
+		Leftammo = Weapon1bullet;
 	}
 }
 void AFPSCharacter::Switch2()
 {
+	firing = false; //연발 누른상태로 스위칭하는경우 방지
 	if (WeaponNum != 2)
 	{
 		WeaponNum = 2;
 		WeaponMesh->SetRelativeScale3D(FVector(0.5f, 1.0f, 1.0f));
 		WeaponMesh->SetRelativeLocation(FVector(70.0f, 40.0f, 100.0f));
+		Ammo = 10;
+		Leftammo = Weapon2bullet;
 	}
 }
 void AFPSCharacter::Switch3()
 {
+	firing = false; //연발 누른상태로 스위칭하는경우 방지
 	if (WeaponNum != 3)
 	{
 		WeaponNum = 3;
 		WeaponMesh->SetRelativeScale3D(FVector(0.25f, 1.0f, 1.0f));
 		WeaponMesh->SetRelativeLocation(FVector(60.0f, 40.0f, 100.0f));
+		Ammo = 3;
+		Leftammo = Weapon3bullet;
 	}
 
 }
@@ -223,26 +250,28 @@ void AFPSCharacter::Reload()
 	if (WeaponNum == 1)
 	{
 		Weapon1bullet = 30;
+		Leftammo = Weapon1bullet;
 	}
 	else if (WeaponNum == 2)
 	{
 		Weapon2bullet = 10;
+		Leftammo = Weapon2bullet;
 	}
 	else if (WeaponNum == 3)
 	{
 		Weapon3bullet = 3;
+		Leftammo = Weapon3bullet;
 	}
 }
 
 void AFPSCharacter::FireCheck()
 {
+	UE_LOG(LogTemp, Log, TEXT("Action"));
 	if (WeaponNum == 1)
 	{
-		if (Weapon1bullet > 0)
-			Fire();
-		else {
-			UE_LOG(LogTemp, Log, TEXT("Reload plz"));
-		}
+		firing = true;
+		Fire();
+		UE_LOG(LogTemp, Log, TEXT("firing=%d"),firing);
 	}
 	else if (WeaponNum == 2)
 	{
@@ -272,5 +301,14 @@ void AFPSCharacter::Heal(int32 healing)
 		HP = 100;
 	else {
 		HP += healing;
+	}
+}
+
+void AFPSCharacter::FireStop()
+{
+	if (WeaponNum == 1) {
+		firing = false;
+		UE_LOG(LogTemp, Log, TEXT("firing=%d"), firing);
+		currentTime = 0;
 	}
 }
