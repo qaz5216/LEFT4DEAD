@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Camera/CameraShake.h"
 #include "FPSCharacter.generated.h"
 UCLASS()
 class PROJECTMOVE_API AFPSCharacter : public ACharacter
@@ -38,7 +39,21 @@ public:
 
 	UFUNCTION()
 		void StopJump();
+	//°È±â
+	UFUNCTION()
+		void StartWalk();
+	UFUNCTION()
+		void StopWalk();
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool walking;
+	//¾É±â
+	UFUNCTION()
+		void StartSitdown();
 
+	UFUNCTION()
+		void StopSitdown();
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool sitting;
 	//¹ß»ç
 	UFUNCTION()
 		void Fire();
@@ -109,8 +124,14 @@ public:
 		float currentTime;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		float firetime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float cameratime;
 	//HP
 	UPROPERTY(BlueprintReadWrite, Category = Useable)
 		int32 HP;
-
+	//Ä«¸Þ¶ó Èçµé¸²
+	UFUNCTION()
+		void ShakeCamerastart();
+	UFUNCTION()
+		void ShakeCameraend();
 };
