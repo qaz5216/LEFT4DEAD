@@ -139,6 +139,8 @@ public:
 	//ÃÑ±â Èçµé¸²
 	float lrecoil;
 	float rrecoil;
+	bool shakeupcamera;
+	bool shakedowncamera;
 	UFUNCTION()
 		void ShakeCamerastart();
 	UFUNCTION()

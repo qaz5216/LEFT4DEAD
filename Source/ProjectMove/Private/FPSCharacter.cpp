@@ -61,6 +61,8 @@ AFPSCharacter::AFPSCharacter()
 	firing = false;
 	currentTime = 0;
 	firetime = 0.2f;
+	shakeupcamera = false;
+	shakedowncamera = false;
 }
 
 // Called when the game starts or when spawned
@@ -90,50 +92,58 @@ void AFPSCharacter::Tick(float DeltaTime)
 	cameratime += DeltaTime;
 	shaketime += DeltaTime;
 	if (shaking) {
+		if (shakingnum % 2 == 0)
+		{
+			LeftMesh->SetRelativeLocation(FVector(75.0f-(10.0f*((shaketime - lrecoil) / 0.05f)), -10.0f, -60.0f));
+			RightMesh->SetRelativeLocation(FVector(90.0f-(10.0f * ((shaketime - lrecoil) / 0.05f)), 40.0f, -60.0f));
+			AddControllerPitchInput(-0.6f * ((shaketime - lrecoil) / 0.05f));
+			lrecoil = shaketime;
+		}
+		else
+		{
+			LeftMesh->SetRelativeLocation(FVector(65.0f+(10.0f * ((shaketime - rrecoil) / 0.05f)), -10.0f, -60.0f));
+			RightMesh->SetRelativeLocation(FVector(80.0f + (10.0f * ((shaketime - rrecoil) / 0.05f)), 40.0f, -60.0f));
+			AddControllerPitchInput(0.6f * ((shaketime - rrecoil) / 0.05f));
+			rrecoil = shaketime;
+		}
 		if (shaketime >= 0.05f) {
 			shaketime = 0;
-			if (shakingnum%2==0)
-			{
-				LeftMesh->SetRelativeLocation(FVector(65.0f, -10.0f, -60.0f));
-				RightMesh->SetRelativeLocation(FVector(80.0f, 40.0f, -60.0f));
-				AddControllerPitchInput(-0.6f);
-				UE_LOG(LogTemp, Log, TEXT("up"));
-			}
-			else
-			{
-				LeftMesh->SetRelativeLocation(FVector(75.0f, -10.0f, -60.0f));
-				RightMesh->SetRelativeLocation(FVector(90.0f, 40.0f, -60.0f));
-				AddControllerPitchInput(0.6f);
-				UE_LOG(LogTemp, Log, TEXT("down"));
-			}
 			shakingnum++;
 			if (shakingnum == 2)
 				shaking = false;
 		}
 	}
-	/*if (shaking) {
-		if (shakingnum % 2 == 0)
-		{
-			AddControllerPitchInput(-0.6f * ((shaketime - lrecoil) / 0.1f));
-			lrecoil += shaketime;
+
+	if (shakeupcamera) {
+		if (cameratime <= 0.1) {
+			if (WeaponNum == 1) {
+				LeftMesh->SetRelativeRotation(FRotator(2.0 * (cameratime / 0.1f), 50.0, 0.0));
+				RightMesh->SetRelativeRotation(FRotator(2.0 * (cameratime / 0.1f), -10.0, 0.0));
+			}
+			else {
+				LeftMesh->SetRelativeRotation(FRotator(30.0 * (cameratime / 0.1f), 50.0, 0.0));
+				RightMesh->SetRelativeRotation(FRotator(30.0 * (cameratime / 0.1f), -10.0, 0.0));
+			}
 		}
-		else
-		{
-			AddControllerPitchInput(0.6f * ((shaketime - rrecoil) / 0.1f));
-			rrecoil += shaketime;
-		}
-		if (shaketime >= 0.1f) {
-			shaketime = 0;
-			lrecoil = 0;
-			rrecoil = 0;
-			shakingnum++;
+	}
+	/*if (shakedowncamera) {
+		if (cameratime >= 0.1) {
+			if (WeaponNum == 1) {
+				LeftMesh->SetRelativeRotation(FRotator(10-10.0 * (cameratime / 0.1f), 50.0, 0.0));
+				RightMesh->SetRelativeRotation(FRotator(10-10.0 * (cameratime / 0.1f), -10.0, 0.0));
+			}
+			else {
+				LeftMesh->SetRelativeRotation(FRotator(30-30.0 * (cameratime / 0.1f), 50.0, 0.0));
+				RightMesh->SetRelativeRotation(FRotator(30-30.0 * (cameratime / 0.1f), -10.0, 0.0));
+			}
 		}
 	}*/
-	if (cameratime >= 0.3f) {
+		if (cameratime >= 0.3f) {
+			shakedowncamera = false;
+			shakeupcamera = false;
 			cameratime = 0;
 			ShakeCameraend();
-	}
-
+		}
 }
 
 // Called to bind functionality to input
@@ -386,27 +396,31 @@ void AFPSCharacter::ShakeCamerastart()
 {
 	shakingnum = 0;
 	cameratime = 0;
-	if (WeaponNum == 1) {
+	/*if (WeaponNum == 1) {
 		LeftMesh->SetRelativeRotation(FRotator(10.0, 50.0, 0.0));
 		RightMesh->SetRelativeRotation(FRotator(10.0, -10.0, 0.0));
 	}
 	else {
 		LeftMesh->SetRelativeRotation(FRotator(30.0, 50.0, 0.0));
 		RightMesh->SetRelativeRotation(FRotator(30.0, -10.0, 0.0));
-	}
+	}*/
 	shaketime = 0;
+	lrecoil = 0;
+	rrecoil = 0;
 	shaking = true;
+	if(!shakeupcamera)
+		shakeupcamera = true;
 }
 
 void AFPSCharacter::ShakeCameraend()
 {
 	shakingnum = 0;
 	shaking = false;
+	cameratime = 0;
 	LeftMesh->SetRelativeRotation(FRotator(0.0, 50.0, 0.0));
 	RightMesh->SetRelativeRotation(FRotator(0.0, -10.0, 0.0));
 	FPSCameraComponent->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
 	shaketime = 0;
-	cameratime = 0;
 }
 
 void AFPSCharacter::StartWalk()
