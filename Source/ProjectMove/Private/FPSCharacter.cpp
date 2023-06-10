@@ -90,19 +90,45 @@ void AFPSCharacter::Tick(float DeltaTime)
 	cameratime += DeltaTime;
 	shaketime += DeltaTime;
 	if (shaking) {
-		if (shaketime >= 0.1f) {
+		if (shaketime >= 0.05f) {
 			shaketime = 0;
 			if (shakingnum%2==0)
 			{
+				LeftMesh->SetRelativeLocation(FVector(65.0f, -10.0f, -60.0f));
+				RightMesh->SetRelativeLocation(FVector(80.0f, 40.0f, -60.0f));
 				AddControllerPitchInput(-0.6f);
+				UE_LOG(LogTemp, Log, TEXT("up"));
 			}
 			else
 			{
-				AddControllerPitchInput(0.3f);
+				LeftMesh->SetRelativeLocation(FVector(75.0f, -10.0f, -60.0f));
+				RightMesh->SetRelativeLocation(FVector(90.0f, 40.0f, -60.0f));
+				AddControllerPitchInput(0.6f);
+				UE_LOG(LogTemp, Log, TEXT("down"));
 			}
 			shakingnum++;
+			if (shakingnum == 2)
+				shaking = false;
 		}
 	}
+	/*if (shaking) {
+		if (shakingnum % 2 == 0)
+		{
+			AddControllerPitchInput(-0.6f * ((shaketime - lrecoil) / 0.1f));
+			lrecoil += shaketime;
+		}
+		else
+		{
+			AddControllerPitchInput(0.6f * ((shaketime - rrecoil) / 0.1f));
+			rrecoil += shaketime;
+		}
+		if (shaketime >= 0.1f) {
+			shaketime = 0;
+			lrecoil = 0;
+			rrecoil = 0;
+			shakingnum++;
+		}
+	}*/
 	if (cameratime >= 0.3f) {
 			cameratime = 0;
 			ShakeCameraend();

@@ -137,6 +137,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Useable)
 		int32 HP;
 	//ÃÑ±â Èçµé¸²
+	float lrecoil;
+	float rrecoil;
 	UFUNCTION()
 		void ShakeCamerastart();
 	UFUNCTION()
