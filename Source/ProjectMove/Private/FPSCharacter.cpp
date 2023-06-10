@@ -81,7 +81,6 @@ void AFPSCharacter::Tick(float DeltaTime)
 	if (firing) {
 		currentTime += DeltaTime;
 		if (currentTime >= firetime) {
-			UE_LOG(LogTemp, Log, TEXT("currenttime=%f"), currentTime);
 			if (Weapon1bullet > 0) {
 				Fire();
 			}
@@ -89,11 +88,25 @@ void AFPSCharacter::Tick(float DeltaTime)
 		}
 	}
 	cameratime += DeltaTime;
+	shaketime += DeltaTime;
+	if (shaking) {
+		if (shaketime >= 0.1f) {
+			shaketime = 0;
+			if (shakingnum%2==0)
+			{
+				AddControllerPitchInput(-0.6f);
+			}
+			else
+			{
+				AddControllerPitchInput(0.3f);
+			}
+			shakingnum++;
+		}
+	}
 	if (cameratime >= 0.3f) {
 			cameratime = 0;
 			ShakeCameraend();
-		}
-	
+	}
 
 }
 
@@ -345,15 +358,28 @@ void AFPSCharacter::FireStop()
 
 void AFPSCharacter::ShakeCamerastart()
 {
+	shakingnum = 0;
 	cameratime = 0;
-	LeftMesh->SetRelativeRotation(FRotator(30.0, 50.0, 0.0));
-	RightMesh->SetRelativeRotation(FRotator(30.0, -10.0, 0.0));
+	if (WeaponNum == 1) {
+		LeftMesh->SetRelativeRotation(FRotator(10.0, 50.0, 0.0));
+		RightMesh->SetRelativeRotation(FRotator(10.0, -10.0, 0.0));
+	}
+	else {
+		LeftMesh->SetRelativeRotation(FRotator(30.0, 50.0, 0.0));
+		RightMesh->SetRelativeRotation(FRotator(30.0, -10.0, 0.0));
+	}
+	shaketime = 0;
+	shaking = true;
 }
 
 void AFPSCharacter::ShakeCameraend()
 {
+	shakingnum = 0;
+	shaking = false;
 	LeftMesh->SetRelativeRotation(FRotator(0.0, 50.0, 0.0));
 	RightMesh->SetRelativeRotation(FRotator(0.0, -10.0, 0.0));
+	FPSCameraComponent->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
+	shaketime = 0;
 	cameratime = 0;
 }
 

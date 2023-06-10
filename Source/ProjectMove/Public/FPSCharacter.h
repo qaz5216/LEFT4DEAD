@@ -55,7 +55,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		bool sitting;
 	//발사
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Useable")
 		void Fire();
 	//발사장탄수 체크
 	UFUNCTION()
@@ -126,10 +126,17 @@ public:
 		float firetime;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		float cameratime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float shaketime;
+	//카메라흔들지
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool shaking;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		int32 shakingnum;
 	//HP
 	UPROPERTY(BlueprintReadWrite, Category = Useable)
 		int32 HP;
-	//카메라 흔들림
+	//총기 흔들림
 	UFUNCTION()
 		void ShakeCamerastart();
 	UFUNCTION()
