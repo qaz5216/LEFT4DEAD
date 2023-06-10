@@ -27,7 +27,6 @@ AFPSProjectile::AFPSProjectile()
 	ProjectileMovementComponent->ProjectileGravityScale = 0;
 	//3초만 살아있음
 	CollisionComponent->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
-
 	CollisionComponent->OnComponentHit.AddDynamic(this, &AFPSProjectile::OnHit);
 }
 
