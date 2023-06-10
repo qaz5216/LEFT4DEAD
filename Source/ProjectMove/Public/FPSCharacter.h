@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Camera/CameraShake.h"
 #include "FPSCharacter.generated.h"
 UCLASS()
 class PROJECTMOVE_API AFPSCharacter : public ACharacter
@@ -38,9 +39,23 @@ public:
 
 	UFUNCTION()
 		void StopJump();
-
-	//¹ß»ç
+	//°È±â
 	UFUNCTION()
+		void StartWalk();
+	UFUNCTION()
+		void StopWalk();
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool walking;
+	//¾É±â
+	UFUNCTION()
+		void StartSitdown();
+
+	UFUNCTION()
+		void StopSitdown();
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool sitting;
+	//¹ß»ç
+	UFUNCTION(BlueprintCallable, Category = "Useable")
 		void Fire();
 	//¹ß»çÀåÅº¼ö Ã¼Å©
 	UFUNCTION()
@@ -109,8 +124,21 @@ public:
 		float currentTime;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		float firetime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float cameratime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float shaketime;
+	//Ä«¸Þ¶óÈçµéÁö
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool shaking;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		int32 shakingnum;
 	//HP
 	UPROPERTY(BlueprintReadWrite, Category = Useable)
 		int32 HP;
-
+	//ÃÑ±â Èçµé¸²
+	UFUNCTION()
+		void ShakeCamerastart();
+	UFUNCTION()
+		void ShakeCameraend();
 };

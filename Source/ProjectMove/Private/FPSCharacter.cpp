@@ -30,7 +30,8 @@ AFPSCharacter::AFPSCharacter()
 	// 일부 환경 섀도잉을 꺼 메시가 하나인 듯 보이는 느낌을 유지합니다.
 	LeftMesh->bCastDynamicShadow = false;
 	LeftMesh->CastShadow = false;
-	LeftMesh->SetRelativeLocation(FVector(90.0f, -40.0f, -60.0f));
+	LeftMesh->SetRelativeLocation(FVector(75.0f, -10.0f, -60.0f));
+	LeftMesh->SetRelativeRotation(FRotator(0.0,50.0,0.0));
 	RightMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightMesh"));
 	RightMesh->SkeletalMesh->AddSocket(SocketMesh);
 	// 소유 플레이어만 이 메시를 볼 수 있습니다.
@@ -42,6 +43,7 @@ AFPSCharacter::AFPSCharacter()
 	RightMesh->CastShadow = false;
 	GetMesh()->SetOwnerNoSee(true);
 	RightMesh->SetRelativeLocation(FVector(90.0f, 40.0f, -60.0f));
+	RightMesh->SetRelativeRotation(FRotator(0.0, -10.0, 0.0));
 	
 	//처음 웨폰 1
 	WeaponNum = 1;
@@ -79,13 +81,33 @@ void AFPSCharacter::Tick(float DeltaTime)
 	if (firing) {
 		currentTime += DeltaTime;
 		if (currentTime >= firetime) {
-			UE_LOG(LogTemp, Log, TEXT("currenttime=%f"), currentTime);
 			if (Weapon1bullet > 0) {
 				Fire();
 			}
 			currentTime = 0;
 		}
 	}
+	cameratime += DeltaTime;
+	shaketime += DeltaTime;
+	if (shaking) {
+		if (shaketime >= 0.1f) {
+			shaketime = 0;
+			if (shakingnum%2==0)
+			{
+				AddControllerPitchInput(-0.6f);
+			}
+			else
+			{
+				AddControllerPitchInput(0.3f);
+			}
+			shakingnum++;
+		}
+	}
+	if (cameratime >= 0.3f) {
+			cameratime = 0;
+			ShakeCameraend();
+	}
+
 }
 
 // Called to bind functionality to input
@@ -103,6 +125,13 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//"action"바인딩 구성
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
+	//걷기
+	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AFPSCharacter::StartWalk);
+	PlayerInputComponent->BindAction("Walk", IE_Released, this, &AFPSCharacter::StopWalk);
+	//웅크리기
+	PlayerInputComponent->BindAction("Sitdown", IE_Pressed, this, &AFPSCharacter::StartSitdown);
+	PlayerInputComponent->BindAction("Sitdown", IE_Released, this, &AFPSCharacter::StopSitdown);
+
 	//발사
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::FireCheck);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSCharacter::FireStop);
@@ -118,12 +147,22 @@ void AFPSCharacter::MoveForward(float Value)
 {
 	//어느쪽이 전방인지 알아내어 플레이어가 그방향으로 이동하고자 한다고 기록합니다.
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+	if (walking)
+	{
+		AddMovementInput(Direction*0.5, Value);
+	}
+	else
 	AddMovementInput(Direction, Value);
 }
 
 void AFPSCharacter::MoveRight(float Value)
 {
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
+	if (walking)
+	{
+		AddMovementInput(Direction * 0.5, Value);
+	}
+	else
 	AddMovementInput(Direction, Value);
 }
 
@@ -156,6 +195,8 @@ void AFPSCharacter::Fire()
 		// 총알 발사를 위로 좀 올림
 		MuzzleLocation.Z += 50.0f;
 		UWorld* World = GetWorld();
+		//카메라 쉐이크
+		ShakeCamerastart();
 		if (World)
 		{
 			FActorSpawnParameters SpawnParams;
@@ -270,7 +311,8 @@ void AFPSCharacter::FireCheck()
 	if (WeaponNum == 1)
 	{
 		firing = true;
-		Fire();
+		if (Weapon1bullet>0)
+			Fire();
 		UE_LOG(LogTemp, Log, TEXT("firing=%d"),firing);
 	}
 	else if (WeaponNum == 2)
@@ -311,4 +353,52 @@ void AFPSCharacter::FireStop()
 		UE_LOG(LogTemp, Log, TEXT("firing=%d"), firing);
 		currentTime = 0;
 	}
+}
+
+
+void AFPSCharacter::ShakeCamerastart()
+{
+	shakingnum = 0;
+	cameratime = 0;
+	if (WeaponNum == 1) {
+		LeftMesh->SetRelativeRotation(FRotator(10.0, 50.0, 0.0));
+		RightMesh->SetRelativeRotation(FRotator(10.0, -10.0, 0.0));
+	}
+	else {
+		LeftMesh->SetRelativeRotation(FRotator(30.0, 50.0, 0.0));
+		RightMesh->SetRelativeRotation(FRotator(30.0, -10.0, 0.0));
+	}
+	shaketime = 0;
+	shaking = true;
+}
+
+void AFPSCharacter::ShakeCameraend()
+{
+	shakingnum = 0;
+	shaking = false;
+	LeftMesh->SetRelativeRotation(FRotator(0.0, 50.0, 0.0));
+	RightMesh->SetRelativeRotation(FRotator(0.0, -10.0, 0.0));
+	FPSCameraComponent->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
+	shaketime = 0;
+	cameratime = 0;
+}
+
+void AFPSCharacter::StartWalk()
+{
+	walking = true;
+}
+
+void AFPSCharacter::StopWalk()
+{
+	walking = false;
+}
+
+void AFPSCharacter::StartSitdown()
+{
+	RootComponent->SetWorldScale3D(FVector(1.0f,1.0f,0.5f));
+}
+
+void AFPSCharacter::StopSitdown()
+{
+	RootComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 }
