@@ -334,7 +334,11 @@ void AFPSCharacter::FireCheck()
 }
 void AFPSCharacter::Attacked(int32 damage)
 {
-	HP -= damage;
+	if (HP - damage <= 0)
+		HP = 0;
+	else {
+		HP -= damage;
+	}
 }
 
 void AFPSCharacter::Heal(int32 healing)
