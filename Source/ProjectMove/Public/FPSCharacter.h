@@ -5,8 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Engine/SkeletalMeshSocket.h"
-#include "Camera/CameraShake.h"
+//#include "Camera/CameraShake.h"
 #include "FPSCharacter.generated.h"
+
 UCLASS()
 class PROJECTMOVE_API AFPSCharacter : public ACharacter
 {

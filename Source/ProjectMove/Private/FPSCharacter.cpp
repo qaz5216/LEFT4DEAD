@@ -33,7 +33,7 @@ AFPSCharacter::AFPSCharacter()
 	LeftMesh->SetRelativeLocation(FVector(75.0f, -10.0f, -60.0f));
 	LeftMesh->SetRelativeRotation(FRotator(0.0,50.0,0.0));
 	RightMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightMesh"));
-	RightMesh->SkeletalMesh->AddSocket(SocketMesh);
+	//RightMesh->SkeletalMesh->AddSocket(SocketMesh);
 	// 소유 플레이어만 이 메시를 볼 수 있습니다.
 	RightMesh->SetOnlyOwnerSee(true);
 	// FPS 메시를 FPS 카메라에 붙입니다.
