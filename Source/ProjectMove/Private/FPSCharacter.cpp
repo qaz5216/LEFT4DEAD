@@ -63,6 +63,9 @@ AFPSCharacter::AFPSCharacter()
 	firetime = 0.2f;
 	shakeupcamera = false;
 	shakedowncamera = false;
+	//카메라 타임 체크
+	checkcameratime = false;
+	sitdowncheck = false;
 }
 
 // Called when the game starts or when spawned
@@ -89,8 +92,10 @@ void AFPSCharacter::Tick(float DeltaTime)
 			currentTime = 0;
 		}
 	}
-	cameratime += DeltaTime;
-	shaketime += DeltaTime;
+	if (checkcameratime) {
+		cameratime += DeltaTime;
+		shaketime += DeltaTime;
+	}
 	if (shaking) {
 		if (shakingnum % 2 == 0)
 		{
@@ -143,6 +148,7 @@ void AFPSCharacter::Tick(float DeltaTime)
 			shakeupcamera = false;
 			cameratime = 0;
 			ShakeCameraend();
+			UE_LOG(LogTemp, Log, TEXT("checking"));
 		}
 }
 
@@ -177,6 +183,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Switch3", IE_Pressed, this, &AFPSCharacter::Switch3);
 	//재장전
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSCharacter::Reload);
+	PlayerInputComponent->BindAction("Logiccheck", IE_Released, this, &AFPSCharacter::Logiccheck);
 }
 
 void AFPSCharacter::MoveForward(float Value)
@@ -229,7 +236,10 @@ void AFPSCharacter::Fire()
 		//조준을 약간 윗쪽으로 올려줍니다.//안올림
 		MuzzleRotation.Pitch += 0.0f;
 		// 총알 발사를 위로 좀 올림
-		MuzzleLocation.Z += 50.0f;
+		if (!sitdowncheck)
+			MuzzleLocation.Z += 50.0f;
+		else
+			MuzzleLocation.Z -= 10.0f;
 		UWorld* World = GetWorld();
 		//카메라 쉐이크
 		ShakeCamerastart();
@@ -412,6 +422,7 @@ void AFPSCharacter::ShakeCamerastart()
 	lrecoil = 0;
 	rrecoil = 0;
 	shaking = true;
+	checkcameratime = true;
 	if(!shakeupcamera)
 		shakeupcamera = true;
 }
@@ -420,6 +431,7 @@ void AFPSCharacter::ShakeCameraend()
 {
 	shakingnum = 0;
 	shaking = false;
+	checkcameratime = false;
 	cameratime = 0;
 	LeftMesh->SetRelativeRotation(FRotator(0.0, 50.0, 0.0));
 	RightMesh->SetRelativeRotation(FRotator(0.0, -10.0, 0.0));
@@ -439,10 +451,18 @@ void AFPSCharacter::StopWalk()
 
 void AFPSCharacter::StartSitdown()
 {
+	sitdowncheck = true;
 	RootComponent->SetWorldScale3D(FVector(1.0f,1.0f,0.5f));
 }
 
 void AFPSCharacter::StopSitdown()
 {
 	RootComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+	sitdowncheck = false;
+}
+
+void AFPSCharacter::Logiccheck()
+{
+	
+
 }

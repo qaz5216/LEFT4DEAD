@@ -142,8 +142,12 @@ public:
 	float rrecoil;
 	bool shakeupcamera;
 	bool shakedowncamera;
+	bool checkcameratime;
+	bool sitdowncheck;
 	UFUNCTION()
 		void ShakeCamerastart();
 	UFUNCTION()
 		void ShakeCameraend();
+	UFUNCTION()
+		void Logiccheck();
 };
