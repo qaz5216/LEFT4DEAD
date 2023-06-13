@@ -83,9 +83,6 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		class UCameraComponent* FPSCameraComponent;
 
-	// ÀÏÀÎÄª ¸Þ½Ã (¿ÞÆÈ)
-	UPROPERTY(EditAnywhere, Category = Mesh)
-		USkeletalMeshComponent* LeftMesh;
 	// ÀÏÀÎÄª ¸Þ½Ã (¿À¸¥ÆÈ)
 	UPROPERTY(EditAnywhere, Category = Mesh)
 		USkeletalMeshComponent* RightMesh;
@@ -129,9 +126,13 @@ public:
 		float cameratime;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		float shaketime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float reloadtime;
 	//Ä«¸Þ¶óÈçµéÁö
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		bool shaking;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		bool reloading;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		int32 shakingnum;
 	//HP
@@ -150,4 +151,7 @@ public:
 		void ShakeCameraend();
 	UFUNCTION()
 		void Logiccheck();
+	UFUNCTION(BlueprintCallable, Category = "Useable")
+		bool GetReload();
+
 };

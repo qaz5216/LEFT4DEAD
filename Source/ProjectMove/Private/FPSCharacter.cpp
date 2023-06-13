@@ -20,18 +20,8 @@ AFPSCharacter::AFPSCharacter()
     // 폰의 로테이션 제어를 허가합니다.
     FPSCameraComponent->bUsePawnControlRotation = true;
 	// 소켓메쉬 입니다.
-	SocketMesh = CreateDefaultSubobject<USkeletalMeshSocket>(TEXT("SocketMesh"));
+	
 	// 일인칭 메시 컴포넌트입니다.
-	LeftMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftMesh"));
-	// 소유 플레이어만 이 메시를 볼 수 있습니다.
-	LeftMesh->SetOnlyOwnerSee(true);
-	// FPS 메시를 FPS 카메라에 붙입니다.
-	LeftMesh->SetupAttachment(FPSCameraComponent);
-	// 일부 환경 섀도잉을 꺼 메시가 하나인 듯 보이는 느낌을 유지합니다.
-	LeftMesh->bCastDynamicShadow = false;
-	LeftMesh->CastShadow = false;
-	LeftMesh->SetRelativeLocation(FVector(75.0f, -10.0f, -60.0f));
-	LeftMesh->SetRelativeRotation(FRotator(0.0,50.0,0.0));
 	RightMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightMesh"));
 	//RightMesh->SkeletalMesh->AddSocket(SocketMesh);
 	// 소유 플레이어만 이 메시를 볼 수 있습니다.
@@ -41,17 +31,13 @@ AFPSCharacter::AFPSCharacter()
 	// 일부 환경 섀도잉을 꺼 메시가 하나인 듯 보이는 느낌을 유지합니다.
 	RightMesh->bCastDynamicShadow = false;
 	RightMesh->CastShadow = false;
-	GetMesh()->SetOwnerNoSee(true);
-	RightMesh->SetRelativeLocation(FVector(90.0f, 40.0f, -60.0f));
-	RightMesh->SetRelativeRotation(FRotator(0.0, -10.0, 0.0));
+	GetMesh()->SetOwnerNoSee(false);
+	RightMesh->SetRelativeLocation(FVector(0.0f, 10.0f, -210.0f));
+	RightMesh->SetRelativeRotation(FRotator(0.0, -100.0, 0.0));
+	RightMesh->SetWorldScale3D(FVector(1.75, 1.45, 1.25));
 	
 	//처음 웨폰 1
 	WeaponNum = 1;
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(RightMesh);
-	WeaponMesh->bCastDynamicShadow = false;
-	WeaponMesh->CastShadow = false;
-	WeaponMesh->SetRelativeLocation(FVector(90.0f, 40.0f, 100.0f));
 	Ammo = 30;
 	Leftammo = 30;
 	Weapon1bullet = 30;
@@ -65,7 +51,8 @@ AFPSCharacter::AFPSCharacter()
 	shakedowncamera = false;
 	//카메라 타임 체크
 	checkcameratime = false;
-	sitdowncheck = false;
+	reloading = false;
+	reloadtime = 0;
 }
 
 // Called when the game starts or when spawned
@@ -99,15 +86,13 @@ void AFPSCharacter::Tick(float DeltaTime)
 	if (shaking) {
 		if (shakingnum % 2 == 0)
 		{
-			LeftMesh->SetRelativeLocation(FVector(75.0f-(10.0f*((shaketime - lrecoil) / 0.05f)), -10.0f, -60.0f));
-			RightMesh->SetRelativeLocation(FVector(90.0f-(10.0f * ((shaketime - lrecoil) / 0.05f)), 40.0f, -60.0f));
+			RightMesh->SetRelativeLocation(FVector(0.0f-(10.0f * ((shaketime - lrecoil) / 0.05f)), 10.0f, -210.0f));
 			AddControllerPitchInput(-0.6f * ((shaketime - lrecoil) / 0.05f));
 			lrecoil = shaketime;
 		}
 		else
 		{
-			LeftMesh->SetRelativeLocation(FVector(65.0f+(10.0f * ((shaketime - rrecoil) / 0.05f)), -10.0f, -60.0f));
-			RightMesh->SetRelativeLocation(FVector(80.0f + (10.0f * ((shaketime - rrecoil) / 0.05f)), 40.0f, -60.0f));
+			RightMesh->SetRelativeLocation(FVector(-10.0f + (10.0f * ((shaketime - rrecoil) / 0.05f)), 10.0f, -210.0f));
 			AddControllerPitchInput(0.6f * ((shaketime - rrecoil) / 0.05f));
 			rrecoil = shaketime;
 		}
@@ -122,34 +107,29 @@ void AFPSCharacter::Tick(float DeltaTime)
 	if (shakeupcamera) {
 		if (cameratime <= 0.1) {
 			if (WeaponNum == 1) {
-				LeftMesh->SetRelativeRotation(FRotator(2.0 * (cameratime / 0.1f), 50.0, 0.0));
-				RightMesh->SetRelativeRotation(FRotator(2.0 * (cameratime / 0.1f), -10.0, 0.0));
+				RightMesh->SetRelativeRotation(FRotator(0.0, -100.0, -2.0 * (cameratime / 0.1f)));
 			}
 			else {
-				LeftMesh->SetRelativeRotation(FRotator(30.0 * (cameratime / 0.1f), 50.0, 0.0));
-				RightMesh->SetRelativeRotation(FRotator(30.0 * (cameratime / 0.1f), -10.0, 0.0));
+				RightMesh->SetRelativeRotation(FRotator(0.0, -100.0, -2.0 * (cameratime / 0.1f)));
 			}
 		}
 	}
-	/*if (shakedowncamera) {
-		if (cameratime >= 0.1) {
-			if (WeaponNum == 1) {
-				LeftMesh->SetRelativeRotation(FRotator(10-10.0 * (cameratime / 0.1f), 50.0, 0.0));
-				RightMesh->SetRelativeRotation(FRotator(10-10.0 * (cameratime / 0.1f), -10.0, 0.0));
-			}
-			else {
-				LeftMesh->SetRelativeRotation(FRotator(30-30.0 * (cameratime / 0.1f), 50.0, 0.0));
-				RightMesh->SetRelativeRotation(FRotator(30-30.0 * (cameratime / 0.1f), -10.0, 0.0));
-			}
-		}
-	}*/
-		if (cameratime >= 0.3f) {
+	if (cameratime >= 0.3f) {
 			shakedowncamera = false;
 			shakeupcamera = false;
 			cameratime = 0;
 			ShakeCameraend();
 			UE_LOG(LogTemp, Log, TEXT("checking"));
+	}
+	if (reloading) {
+		reloadtime += DeltaTime;
+		if (reloadtime >= 4) {
+			reloading = false;
+			reloadtime = 0;
 		}
+	}
+
+	//라인트레이스
 }
 
 // Called to bind functionality to input
@@ -301,8 +281,8 @@ void AFPSCharacter::Switch1()
 	if (WeaponNum != 1) 
 	{
 		WeaponNum = 1;
-		WeaponMesh->SetRelativeScale3D(FVector(1.0f,1.0f,1.0f));
-		WeaponMesh->SetRelativeLocation(FVector(90.0f, 40.0f, 100.0f));
+		/*WeaponMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+		WeaponMesh->SetRelativeLocation(FVector(90.0f, 40.0f, 100.0f));*/
 		Ammo = 30;
 		Leftammo = Weapon1bullet;
 	}
@@ -313,8 +293,8 @@ void AFPSCharacter::Switch2()
 	if (WeaponNum != 2)
 	{
 		WeaponNum = 2;
-		WeaponMesh->SetRelativeScale3D(FVector(0.5f, 1.0f, 1.0f));
-		WeaponMesh->SetRelativeLocation(FVector(70.0f, 40.0f, 100.0f));
+		//WeaponMesh->SetRelativeScale3D(FVector(0.5f, 1.0f, 1.0f));
+		//WeaponMesh->SetRelativeLocation(FVector(70.0f, 40.0f, 100.0f));
 		Ammo = 10;
 		Leftammo = Weapon2bullet;
 	}
@@ -325,8 +305,8 @@ void AFPSCharacter::Switch3()
 	if (WeaponNum != 3)
 	{
 		WeaponNum = 3;
-		WeaponMesh->SetRelativeScale3D(FVector(0.25f, 1.0f, 1.0f));
-		WeaponMesh->SetRelativeLocation(FVector(60.0f, 40.0f, 100.0f));
+		/*WeaponMesh->SetRelativeScale3D(FVector(0.25f, 1.0f, 1.0f));
+		WeaponMesh->SetRelativeLocation(FVector(60.0f, 40.0f, 100.0f));*/
 		Ammo = 3;
 		Leftammo = Weapon3bullet;
 	}
@@ -334,6 +314,8 @@ void AFPSCharacter::Switch3()
 }
 void AFPSCharacter::Reload()
 {
+	reloading = true;
+	reloadtime = 0;
 	if (WeaponNum == 1)
 	{
 		Weapon1bullet = 30;
@@ -410,14 +392,6 @@ void AFPSCharacter::ShakeCamerastart()
 {
 	shakingnum = 0;
 	cameratime = 0;
-	/*if (WeaponNum == 1) {
-		LeftMesh->SetRelativeRotation(FRotator(10.0, 50.0, 0.0));
-		RightMesh->SetRelativeRotation(FRotator(10.0, -10.0, 0.0));
-	}
-	else {
-		LeftMesh->SetRelativeRotation(FRotator(30.0, 50.0, 0.0));
-		RightMesh->SetRelativeRotation(FRotator(30.0, -10.0, 0.0));
-	}*/
 	shaketime = 0;
 	lrecoil = 0;
 	rrecoil = 0;
@@ -433,9 +407,7 @@ void AFPSCharacter::ShakeCameraend()
 	shaking = false;
 	checkcameratime = false;
 	cameratime = 0;
-	LeftMesh->SetRelativeRotation(FRotator(0.0, 50.0, 0.0));
-	RightMesh->SetRelativeRotation(FRotator(0.0, -10.0, 0.0));
-	FPSCameraComponent->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
+	RightMesh->SetRelativeRotation(FRotator(0.0, -100.0, 0.0));
 	shaketime = 0;
 }
 
@@ -463,6 +435,10 @@ void AFPSCharacter::StopSitdown()
 
 void AFPSCharacter::Logiccheck()
 {
-	
+	UE_LOG(LogTemp, Log, TEXT("Reload=%d"),reloading);
+}
 
+bool AFPSCharacter::GetReload()
+{
+	return reloading;
 }
