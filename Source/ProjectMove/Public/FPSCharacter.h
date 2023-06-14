@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Engine/SkeletalMeshSocket.h"
-//#include "Camera/CameraShake.h"
+#include "Weapon.h"
 #include "FPSCharacter.generated.h"
 
 UCLASS()
@@ -154,4 +154,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Useable")
 		bool GetReload();
 
+	//√—±‚≈¨∑°Ω∫
+	UPROPERTY(EditAnywhere, Category="Weapon",meta=(AllowPrivateAccess="true"))
+	TSubclassOf<class AWeapon> _weapon;
+	AWeapon* equip_weapon;
+	void AttachWeapon(TSubclassOf<class AWeapon> weapon);
 };
