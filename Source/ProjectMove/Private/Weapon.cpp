@@ -10,6 +10,7 @@ AWeapon::AWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 	_StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh"));
 	_StaticMeshComponent->SetupAttachment(GetRootComponent());
+	_ammoRemainCount = _ammoMaxCount;
 }
 
 // Called when the game starts or when spawned
