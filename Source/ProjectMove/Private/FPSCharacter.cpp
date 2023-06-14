@@ -53,6 +53,8 @@ AFPSCharacter::AFPSCharacter()
 	checkcameratime = false;
 	reloading = false;
 	reloadtime = 0;
+	//불러와서 붙여보자
+	//ConstructorHelpers::FObjectFinder<AWeapon> TempWeapon("")
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +65,8 @@ void AFPSCharacter::BeginPlay()
 	{
 		// 5 초간 디버그 메시지를 표시합니다. (첫 인수인) -1 "Key" 값은 이 메시지를 업데이트 또는 새로고칠 필요가 없음을 나타냅니다.
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
+		
+		AttachWeapon(_weapon);
 	}
 }
 
@@ -335,8 +339,8 @@ void AFPSCharacter::Reload()
 
 void AFPSCharacter::FireCheck()
 {
-	UE_LOG(LogTemp, Log, TEXT("Action"));
-	if (WeaponNum == 1)
+
+	/*if (WeaponNum == 1)
 	{
 		firing = true;
 		if (Weapon1bullet>0)
@@ -358,8 +362,27 @@ void AFPSCharacter::FireCheck()
 		else {
 			UE_LOG(LogTemp, Log, TEXT("Reload plz"));
 		}
+	}*/
+	if (equip_weapon)
+	{
+		equip_weapon->StartFire(this);
 	}
 }
+
+void AFPSCharacter::FireStop()
+{
+	/*if (WeaponNum == 1) {
+		firing = false;
+		UE_LOG(LogTemp, Log, TEXT("firing=%d"), firing);
+		currentTime = 0;
+	}*/
+	if (equip_weapon)
+	{
+		UE_LOG(LogTemp, Log, TEXT("FireStop"));
+		equip_weapon->StopFire();
+	}
+}
+
 void AFPSCharacter::Attacked(int32 damage)
 {
 	if (HP - damage <= 0)
@@ -375,15 +398,6 @@ void AFPSCharacter::Heal(int32 healing)
 		HP = 100;
 	else {
 		HP += healing;
-	}
-}
-
-void AFPSCharacter::FireStop()
-{
-	if (WeaponNum == 1) {
-		firing = false;
-		UE_LOG(LogTemp, Log, TEXT("firing=%d"), firing);
-		currentTime = 0;
 	}
 }
 
@@ -441,4 +455,18 @@ void AFPSCharacter::Logiccheck()
 bool AFPSCharacter::GetReload()
 {
 	return reloading;
+}
+
+//총기 붙이기
+void AFPSCharacter::AttachWeapon(TSubclassOf<class AWeapon> weapon) 
+{
+	if (weapon)
+	{
+		equip_weapon = GetWorld()->SpawnActor<AWeapon>(weapon);
+		const USkeletalMeshSocket* weaponSocket = RightMesh->GetSocketByName("WeaponSocket");
+		if (equip_weapon && weaponSocket)
+		{
+			weaponSocket->AttachActor(equip_weapon, RightMesh);
+		}
+	}
 }
