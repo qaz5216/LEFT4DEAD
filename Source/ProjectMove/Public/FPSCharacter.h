@@ -155,8 +155,10 @@ public:
 		bool GetReload();
 
 	//√—±‚≈¨∑°Ω∫
-	UPROPERTY(EditAnywhere, Category="Weapon",meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category="Weapon",meta=(AllowPrivateAccess="true"))
 	TSubclassOf<class AWeapon> _weapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Weapon",meta=(AllowPrivateAccess="true"))
 	AWeapon* equip_weapon;
 	void AttachWeapon(TSubclassOf<class AWeapon> weapon);
+
 };

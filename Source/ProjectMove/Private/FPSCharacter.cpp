@@ -318,22 +318,9 @@ void AFPSCharacter::Switch3()
 }
 void AFPSCharacter::Reload()
 {
-	reloading = true;
-	reloadtime = 0;
-	if (WeaponNum == 1)
+	if (equip_weapon)
 	{
-		Weapon1bullet = 30;
-		Leftammo = Weapon1bullet;
-	}
-	else if (WeaponNum == 2)
-	{
-		Weapon2bullet = 10;
-		Leftammo = Weapon2bullet;
-	}
-	else if (WeaponNum == 3)
-	{
-		Weapon3bullet = 3;
-		Leftammo = Weapon3bullet;
+		equip_weapon->Reloading(this);
 	}
 }
 

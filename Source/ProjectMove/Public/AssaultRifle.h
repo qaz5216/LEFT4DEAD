@@ -17,14 +17,14 @@ class PROJECTMOVE_API AAssaultRifle : public AWeapon
 		FTimerHandle FireTimerHandle;
 
 	public:
-		virtual void StartFire(const class AFPSCharacter* owner);
+		virtual void StartFire(class AFPSCharacter* owner);
 		////발사중지
 		virtual void StopFire();
 
 		////재장전
-		virtual void Reloading() { ; }
+		virtual void Reloading(class AFPSCharacter* owner);
 		//// Called every frame
-		virtual void FireWithLineTrace(const class AFPSCharacter* owner);
+		virtual void FireWithLineTrace(class AFPSCharacter* owner);
 		
 		UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AFPSProjectile> ProjectileClass;

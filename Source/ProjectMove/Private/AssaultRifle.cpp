@@ -4,7 +4,7 @@
 #include "AssaultRifle.h"
 #include "FPSCharacter.h"
 #include "FPSProjectile.h"
-void AAssaultRifle::StartFire(const AFPSCharacter* owner)
+void AAssaultRifle::StartFire(AFPSCharacter* owner)
 {
 	if (owner)
 	{
@@ -23,13 +23,13 @@ void AAssaultRifle::StartFire(const AFPSCharacter* owner)
 	}
 }
 
-void AAssaultRifle::FireWithLineTrace(const class AFPSCharacter* owner)
+void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 {
-	if (_ammoRemainCount < 0)
+	if (_ammoRemainCount <= 0)
 	{
 		StopFire();
 	}
-	if (owner)
+	else if (owner)
 	{
 		const AController* ownerController = owner->GetController();
 
@@ -80,6 +80,7 @@ void AAssaultRifle::FireWithLineTrace(const class AFPSCharacter* owner)
 								projectile->ProjectileMovementComponent->InitialSpeed = 3000.0f;
 								projectile->ProjectileMovementComponent->MaxSpeed = 3000.0f;
 								_ammoRemainCount--;
+								owner->Leftammo = _ammoRemainCount;
 								GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"),_ammoRemainCount));
 							}
 						}
@@ -95,4 +96,10 @@ void AAssaultRifle::FireWithLineTrace(const class AFPSCharacter* owner)
 void AAssaultRifle::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(FireTimerHandle);
+}
+
+void AAssaultRifle::Reloading(class AFPSCharacter* owner)
+{
+	_ammoRemainCount = 30;
+	owner->Leftammo = _ammoRemainCount;
 }

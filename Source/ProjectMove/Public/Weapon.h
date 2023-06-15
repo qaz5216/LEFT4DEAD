@@ -32,7 +32,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"));
 	int _ammoMaxCount = 30;
 	//현재소지한 탄약의 개수
-	UPROPERTY(EditAnywhere, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"));
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"));
 	int _ammoRemainCount ;
 	//재장전까지 걸리는시간
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"));
@@ -52,13 +52,13 @@ protected:
 
 public:	
 	////발사시작
-	virtual void StartFire(const class AFPSCharacter* owner) { ; }
+	virtual void StartFire(class AFPSCharacter* owner) { ; }
 	////발사중지
 	virtual void StopFire() { ; }
 
 	////재장전
-	virtual void Reloading() { ; }
+	virtual void Reloading(class AFPSCharacter* owner) { ; }
 	//// Called every frame
-	virtual void FireWithLineTrace(const class AFPSCharacter* owner) { ; }
+	virtual void FireWithLineTrace(class AFPSCharacter* owner) { ; }
 	virtual void Tick(float DeltaTime) override;
 };
