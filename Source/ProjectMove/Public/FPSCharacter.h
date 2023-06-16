@@ -62,6 +62,8 @@ public:
 	UFUNCTION()
 		void FireCheck();
 	UFUNCTION()
+		void Interaction();
+	UFUNCTION()
 		void FireStop();
 	//총 스위칭
 	UFUNCTION()
@@ -78,7 +80,7 @@ public:
 		void Attacked(int32 damage);
 	//체력회복
 	UFUNCTION(BlueprintCallable, Category = "Useable")
-		void Heal(int32 healing);
+		void Heal();
 	//FPS카메라
 	UPROPERTY(VisibleAnywhere)
 		class UCameraComponent* FPSCameraComponent;
@@ -128,6 +130,8 @@ public:
 		float shaketime;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		float reloadtime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
+		float linedelaytime; // 라인트레이스 시간
 	//카메라흔들지
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		bool shaking;
@@ -138,6 +142,9 @@ public:
 	//HP
 	UPROPERTY(BlueprintReadWrite, Category = Useable)
 		int32 HP;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere ,Category = Useable)
+		int32 HillPackNum;
 	//총기 흔들림
 	float lrecoil;
 	float rrecoil;
@@ -162,4 +169,5 @@ public:
 	void AttachWeapon(TSubclassOf<class AWeapon> weapon);
 	UPROPERTY()
 	UAnimationAsset* ReloadAinm;
+	FTimerHandle shakehandle;
 };

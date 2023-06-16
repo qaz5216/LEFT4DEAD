@@ -4,6 +4,8 @@
 #include "Camera/CameraComponent.h"
 #include "FPSProjectile.h"
 #include "GameFramework/Character.h"
+#include "HillPack.h"
+#include "AssaultRifle.h"
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -59,6 +61,7 @@ AFPSCharacter::AFPSCharacter()
 	{
 		ReloadAinm = TempAinm.Object;
 	}
+	linedelaytime = 0;
 }
 
 // Called when the game starts or when spawned
@@ -72,6 +75,7 @@ void AFPSCharacter::BeginPlay()
 		
 		AttachWeapon(_weapon);
 	}
+	HillPackNum = 0;
 }
 
 // Called every frame
@@ -139,6 +143,36 @@ void AFPSCharacter::Tick(float DeltaTime)
 	}
 
 	//라인트레이스
+	linedelaytime += DeltaTime;
+	if (linedelaytime >= 0.1f)
+	{
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+		FVector start = CameraLocation;
+		start.Z -= 18.5f;
+		FVector end = (CameraRotation.Vector() * 400.0f) + start;
+		FHitResult hitResult;
+		FCollisionQueryParams collisionParams;
+		collisionParams.AddIgnoredActor(this);
+		DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1.0f);
+		if (GetWorld()->LineTraceSingleByChannel(
+			hitResult,
+			start,
+			end,
+			ECC_Visibility,
+			collisionParams))
+		{
+			if (hitResult.GetActor())
+			{
+				auto* hitActor = hitResult.GetActor();
+				//뭐에맞았는지 확인용
+				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
+			}
+		}
+		linedelaytime = 0;
+	}
+
 }
 
 // Called to bind functionality to input
@@ -173,6 +207,10 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//재장전
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSCharacter::Reload);
 	PlayerInputComponent->BindAction("Logiccheck", IE_Released, this, &AFPSCharacter::Logiccheck);
+	//상호작용 바인드
+	PlayerInputComponent->BindAction("Interaction", IE_Released, this, &AFPSCharacter::Interaction);
+	//힐링 임시
+	PlayerInputComponent->BindAction("Healing", IE_Released, this, &AFPSCharacter::Heal);
 }
 
 void AFPSCharacter::MoveForward(float Value)
@@ -325,7 +363,7 @@ void AFPSCharacter::Reload()
 {
 	if (!reloading)
 	{
-		if (equip_weapon)
+		if (equip_weapon!=nullptr)
 		{
 			reloading = true;
 			reloadtime = 0;
@@ -364,7 +402,7 @@ void AFPSCharacter::FireCheck()
 			UE_LOG(LogTemp, Log, TEXT("Reload plz"));
 		}
 	}*/
-	if (equip_weapon&&!reloading)
+	if (equip_weapon!=nullptr&&!reloading)
 	{
 			equip_weapon->StartFire(this);
 	}
@@ -377,7 +415,7 @@ void AFPSCharacter::FireStop()
 		UE_LOG(LogTemp, Log, TEXT("firing=%d"), firing);
 		currentTime = 0;
 	}*/
-	if (equip_weapon)
+	if (equip_weapon!=nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("FireStop"));
 		equip_weapon->StopFire();
@@ -393,12 +431,22 @@ void AFPSCharacter::Attacked(int32 damage)
 	}
 }
 
-void AFPSCharacter::Heal(int32 healing)
+void AFPSCharacter::Heal()
 {
-	if (HP + healing >= 100)
-		HP = 100;
-	else {
-		HP += healing;
+	int32 healing = 50;
+	if (HillPackNum > 0) {
+		if (HP==100)
+		{
+			;
+		}
+		else if (HP + healing >= 100) {
+			HP = 100;
+			HillPackNum--;
+		}
+		else {
+			HP += healing;
+			HillPackNum--;
+		}
 	}
 }
 
@@ -448,11 +496,6 @@ void AFPSCharacter::StopSitdown()
 	sitdowncheck = false;
 }
 
-void AFPSCharacter::Logiccheck()
-{
-	UE_LOG(LogTemp, Log, TEXT("Reload=%d"),reloading);
-}
-
 bool AFPSCharacter::GetReload()
 {
 	return reloading;
@@ -465,9 +508,79 @@ void AFPSCharacter::AttachWeapon(TSubclassOf<class AWeapon> weapon)
 	{
 		equip_weapon = GetWorld()->SpawnActor<AWeapon>(weapon);
 		const USkeletalMeshSocket* weaponSocket = RightMesh->GetSocketByName("WeaponSocket");
-		if (equip_weapon && weaponSocket)
+		if (equip_weapon != nullptr && weaponSocket)
 		{
 			weaponSocket->AttachActor(equip_weapon, RightMesh);
 		}
 	}
+}
+
+//상호작용
+void AFPSCharacter::Interaction()
+{
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	GetActorEyesViewPoint(CameraLocation, CameraRotation);
+	FVector start = CameraLocation;
+	start.Z -= 18.5f;
+	FVector end = (CameraRotation.Vector() * 400.0f) + start;
+	FHitResult hitResult;
+	FCollisionQueryParams collisionParams;
+	collisionParams.AddIgnoredActor(this);
+	DrawDebugLine(GetWorld(), start, end, FColor::Blue, false, 1.0f);
+	if (GetWorld()->LineTraceSingleByChannel(
+		hitResult,
+		start,
+		end,
+		ECC_Visibility,
+		collisionParams))
+	{
+		if (hitResult.GetActor())
+		{
+			auto* hitActor = hitResult.GetActor();
+			//뭐에맞았는지 확인용
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
+			AWeapon* HitWeapon = Cast<AWeapon>(hitActor);
+			if (HitWeapon!=nullptr)
+			{
+				AHillPack* isHillPack = Cast<AHillPack>(HitWeapon);
+				if (isHillPack != nullptr)
+				{
+					hitActor->Destroy();
+					HillPackNum++;
+				}
+				else
+				{
+					AAssaultRifle* isAssaultRifle = Cast<AAssaultRifle>(HitWeapon);
+					if (isAssaultRifle != nullptr)
+					{
+						if (equip_weapon!=nullptr)
+						{
+							equip_weapon->Destroy();
+							equip_weapon = nullptr;
+						}
+						equip_weapon = isAssaultRifle;
+						const USkeletalMeshSocket* weaponSocket = RightMesh->GetSocketByName("WeaponSocket");
+						if (equip_weapon != nullptr && weaponSocket)
+						{
+							weaponSocket->AttachActor(equip_weapon, RightMesh);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+
+//////////////검증
+
+void AFPSCharacter::Logiccheck()
+{
+	equip_weapon->Destroy();
+	equip_weapon = nullptr;
 }
