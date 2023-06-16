@@ -160,5 +160,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Weapon",meta=(AllowPrivateAccess="true"))
 	AWeapon* equip_weapon;
 	void AttachWeapon(TSubclassOf<class AWeapon> weapon);
-
+	UPROPERTY()
+	UAnimationAsset* ReloadAinm;
 };

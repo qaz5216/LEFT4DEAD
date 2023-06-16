@@ -54,7 +54,11 @@ AFPSCharacter::AFPSCharacter()
 	reloading = false;
 	reloadtime = 0;
 	//불러와서 붙여보자
-	//ConstructorHelpers::FObjectFinder<AWeapon> TempWeapon("")
+	ConstructorHelpers::FObjectFinder<UAnimationAsset>TempAinm(TEXT("/Script/Engine.AnimSequence'/Game/Animations/Reloading_Anim.Reloading_Anim'"));
+	if (TempAinm.Succeeded())
+	{
+		ReloadAinm = TempAinm.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -127,7 +131,8 @@ void AFPSCharacter::Tick(float DeltaTime)
 	}
 	if (reloading) {
 		reloadtime += DeltaTime;
-		if (reloadtime >= 4) {
+		if (reloadtime >= 3.0f) {
+			equip_weapon->Reloading(this);
 			reloading = false;
 			reloadtime = 0;
 		}
@@ -318,10 +323,19 @@ void AFPSCharacter::Switch3()
 }
 void AFPSCharacter::Reload()
 {
-	if (equip_weapon)
+	if (!reloading)
 	{
-		equip_weapon->Reloading(this);
+		if (equip_weapon)
+		{
+			reloading = true;
+			reloadtime = 0;
+			if (ReloadAinm != nullptr)
+			{
+				RightMesh->PlayAnimation(ReloadAinm, false);
+			}
+		}
 	}
+	
 }
 
 void AFPSCharacter::FireCheck()
@@ -350,9 +364,9 @@ void AFPSCharacter::FireCheck()
 			UE_LOG(LogTemp, Log, TEXT("Reload plz"));
 		}
 	}*/
-	if (equip_weapon)
+	if (equip_weapon&&!reloading)
 	{
-		equip_weapon->StartFire(this);
+			equip_weapon->StartFire(this);
 	}
 }
 

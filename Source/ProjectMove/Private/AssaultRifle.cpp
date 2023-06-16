@@ -80,6 +80,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 								projectile->ProjectileMovementComponent->MaxSpeed = 3000.0f;
 								_ammoRemainCount--;
 								owner->Leftammo = _ammoRemainCount;
+								owner->ShakeCamerastart();
 								GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"),_ammoRemainCount));
 							}
 						}
@@ -108,6 +109,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 							projectile->ProjectileMovementComponent->MaxSpeed = 3000.0f;
 							_ammoRemainCount--;
 							owner->Leftammo = _ammoRemainCount;
+							owner->ShakeCamerastart();
 							GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"), _ammoRemainCount));
 						}
 					}
