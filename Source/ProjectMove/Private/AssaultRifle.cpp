@@ -61,6 +61,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
 					FVector projectiledirection = hitResult.Location - owner->RightMesh->GetSocketLocation("WeaponSocket");
 					UWorld* world = GetWorld();
+					UE_LOG(LogTemp, Log, TEXT("FUCK"));
 					if (world)
 					{
 						FActorSpawnParameters SpawnParams;
@@ -69,8 +70,6 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 						AFPSProjectile* projectile = world->SpawnActor<AFPSProjectile>(ProjectileClass, owner->RightMesh->GetSocketLocation("WeaponSocket"), CameraRotation, SpawnParams);
 						if (projectile)
 						{	
-
-							
 								//총알 출발위치생성
 							projectile->SetActorLocation(owner->RightMesh->GetSocketLocation("WeaponSocket"));
 							if (projectiledirection.Normalize())
@@ -86,6 +85,32 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 						}
 					}
 
+				}
+			}
+			else { // 맞은게 없으면
+				FVector projectiledirection = end - owner->RightMesh->GetSocketLocation("WeaponSocket");
+				UWorld* world = GetWorld();
+				if (world)
+				{
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.Owner = this;
+					SpawnParams.Instigator = GetInstigator();
+					AFPSProjectile* projectile = world->SpawnActor<AFPSProjectile>(ProjectileClass, owner->RightMesh->GetSocketLocation("WeaponSocket"), CameraRotation, SpawnParams);
+					if (projectile)
+					{
+						//총알 출발위치생성
+						projectile->SetActorLocation(owner->RightMesh->GetSocketLocation("WeaponSocket"));
+						if (projectiledirection.Normalize())
+						{
+							projectile->FireInDirection(projectiledirection);
+							projectile->SetLifeSpan(3.0f);
+							projectile->ProjectileMovementComponent->InitialSpeed = 3000.0f;
+							projectile->ProjectileMovementComponent->MaxSpeed = 3000.0f;
+							_ammoRemainCount--;
+							owner->Leftammo = _ammoRemainCount;
+							GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"), _ammoRemainCount));
+						}
+					}
 				}
 			}
 
