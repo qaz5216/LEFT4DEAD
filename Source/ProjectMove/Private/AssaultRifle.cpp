@@ -40,7 +40,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 			owner->GetActorEyesViewPoint(CameraLocation, CameraRotation);
 			//MuzzleOffset 을 카메라 스페이스에서 월드 스페이스로 변환
 			FVector start = CameraLocation;
-			start.Z += 50.0f;
+			start.Z += 0.0f;
 			FVector end = (CameraRotation.Vector()* _traceDistance) + start;
 			FHitResult hitResult;
 			FCollisionQueryParams collisionParams;
@@ -61,7 +61,6 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
 					FVector projectiledirection = hitResult.Location - owner->RightMesh->GetSocketLocation("WeaponSocket");
 					UWorld* world = GetWorld();
-					UE_LOG(LogTemp, Log, TEXT("FUCK"));
 					if (world)
 					{
 						FActorSpawnParameters SpawnParams;
