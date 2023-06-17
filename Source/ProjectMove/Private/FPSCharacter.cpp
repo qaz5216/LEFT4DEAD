@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "HillPack.h"
 #include "AssaultRifle.h"
+#include "AmmoPack.h"
+#include "GameFramework/CharacterMovementComponent.h"
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -41,8 +43,8 @@ AFPSCharacter::AFPSCharacter()
 	//처음 웨폰 1
 	WeaponNum = 1;
 	Ammo = 30;
-	Leftammo = 30;
-	Weapon1bullet = 30;
+	Leftammo = 0;
+	Weapon1bullet = 0;
 	Weapon2bullet = 10;
 	Weapon3bullet = 3;
 	HP = 100;
@@ -62,6 +64,7 @@ AFPSCharacter::AFPSCharacter()
 		ReloadAinm = TempAinm.Object;
 	}
 	linedelaytime = 0;
+	GetCharacterMovement()->JumpZVelocity = GetCharacterMovement()->JumpZVelocity*0.6;
 }
 
 // Called when the game starts or when spawned
@@ -74,6 +77,8 @@ void AFPSCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
 		
 		AttachWeapon(_weapon);
+		equip_weapon->Destroy();
+		equip_weapon = nullptr;
 	}
 	HillPackNum = 0;
 }
@@ -155,7 +160,7 @@ void AFPSCharacter::Tick(float DeltaTime)
 		FHitResult hitResult;
 		FCollisionQueryParams collisionParams;
 		collisionParams.AddIgnoredActor(this);
-		DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1.0f);
+		//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1.0f);
 		if (GetWorld()->LineTraceSingleByChannel(
 			hitResult,
 			start,
@@ -219,10 +224,10 @@ void AFPSCharacter::MoveForward(float Value)
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
 	if (walking)
 	{
-		AddMovementInput(Direction*0.5, Value);
+		AddMovementInput(Direction*0.2, Value);
 	}
 	else
-	AddMovementInput(Direction, Value);
+	AddMovementInput(Direction*0.4, Value);
 }
 
 void AFPSCharacter::MoveRight(float Value)
@@ -230,10 +235,10 @@ void AFPSCharacter::MoveRight(float Value)
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 	if (walking)
 	{
-		AddMovementInput(Direction * 0.5, Value);
+		AddMovementInput(Direction * 0.2, Value);
 	}
 	else
-	AddMovementInput(Direction, Value);
+	AddMovementInput(Direction * 0.4, Value);
 }
 
 void AFPSCharacter::StartJump()
@@ -487,12 +492,12 @@ void AFPSCharacter::StopWalk()
 void AFPSCharacter::StartSitdown()
 {
 	sitdowncheck = true;
-	RootComponent->SetWorldScale3D(FVector(1.0f,1.0f,0.5f));
+	RootComponent->SetWorldScale3D(FVector(0.4f, 0.4f,0.2f));
 }
 
 void AFPSCharacter::StopSitdown()
 {
-	RootComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+	RootComponent->SetWorldScale3D(FVector(0.4f, 0.4f, 0.4f));
 	sitdowncheck = false;
 }
 
@@ -527,7 +532,7 @@ void AFPSCharacter::Interaction()
 	FHitResult hitResult;
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(this);
-	DrawDebugLine(GetWorld(), start, end, FColor::Blue, false, 1.0f);
+	//DrawDebugLine(GetWorld(), start, end, FColor::Blue, false, 1.0f);
 	if (GetWorld()->LineTraceSingleByChannel(
 		hitResult,
 		start,
@@ -551,19 +556,37 @@ void AFPSCharacter::Interaction()
 				}
 				else
 				{
-					AAssaultRifle* isAssaultRifle = Cast<AAssaultRifle>(HitWeapon);
-					if (isAssaultRifle != nullptr)
+					AAmmoPack* isAmmoPack = Cast<AAmmoPack>(HitWeapon);
+					if (isAmmoPack != nullptr) {
+						Weapon1bullet = 180;
+					}
+					else
 					{
-						if (equip_weapon!=nullptr)
+						AAssaultRifle* isAssaultRifle = Cast<AAssaultRifle>(HitWeapon);
+						if (isAssaultRifle != nullptr)
 						{
-							equip_weapon->Destroy();
-							equip_weapon = nullptr;
-						}
-						equip_weapon = isAssaultRifle;
-						const USkeletalMeshSocket* weaponSocket = RightMesh->GetSocketByName("WeaponSocket");
-						if (equip_weapon != nullptr && weaponSocket)
-						{
-							weaponSocket->AttachActor(equip_weapon, RightMesh);
+							if (equip_weapon != nullptr)
+							{
+								if (Weapon1bullet + Leftammo >= 180)
+								{
+									Weapon1bullet = 180;
+								}
+								else
+								{
+									Weapon1bullet += Leftammo;
+
+								}
+								Leftammo = 0;
+								equip_weapon->Destroy();
+								equip_weapon = nullptr;
+							}
+							equip_weapon = isAssaultRifle;
+							Leftammo = 30;
+							const USkeletalMeshSocket* weaponSocket = RightMesh->GetSocketByName("WeaponSocket");
+							if (equip_weapon != nullptr && weaponSocket)
+							{
+								weaponSocket->AttachActor(equip_weapon, RightMesh);
+							}
 						}
 					}
 				}

@@ -40,7 +40,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 			owner->GetActorEyesViewPoint(CameraLocation, CameraRotation);
 			//MuzzleOffset 을 카메라 스페이스에서 월드 스페이스로 변환
 			FVector start = CameraLocation;
-			start.Z += 0.0f;
+			start.Z -= 18.5f;
 			FVector end = (CameraRotation.Vector()* _traceDistance) + start;
 			FHitResult hitResult;
 			FCollisionQueryParams collisionParams;
@@ -126,6 +126,15 @@ void AAssaultRifle::StopFire()
 
 void AAssaultRifle::Reloading(class AFPSCharacter* owner)
 {
-	_ammoRemainCount = 30;
-	owner->Leftammo = _ammoRemainCount;
+	if (owner->Weapon1bullet>=30)
+	{
+		_ammoRemainCount = 30;
+		owner->Leftammo = _ammoRemainCount;
+		owner->Weapon1bullet -= 30;
+	}
+	else {
+		_ammoRemainCount = owner->Weapon1bullet;
+		owner->Leftammo = _ammoRemainCount;
+		owner->Weapon1bullet = 0;
+	}
 }
