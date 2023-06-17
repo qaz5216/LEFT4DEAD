@@ -370,11 +370,14 @@ void AFPSCharacter::Reload()
 	{
 		if (equip_weapon!=nullptr)
 		{
-			reloading = true;
-			reloadtime = 0;
-			if (ReloadAinm != nullptr)
+			if (Weapon1bullet!=0)
 			{
-				RightMesh->PlayAnimation(ReloadAinm, false);
+				reloading = true;
+				reloadtime = 0;
+				if (ReloadAinm != nullptr)
+				{
+					RightMesh->PlayAnimation(ReloadAinm, false);
+				}
 			}
 		}
 	}

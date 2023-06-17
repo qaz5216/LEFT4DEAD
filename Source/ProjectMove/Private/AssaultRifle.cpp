@@ -128,13 +128,42 @@ void AAssaultRifle::Reloading(class AFPSCharacter* owner)
 {
 	if (owner->Weapon1bullet>=30)
 	{
-		_ammoRemainCount = 30;
-		owner->Leftammo = _ammoRemainCount;
-		owner->Weapon1bullet -= 30;
+		if (_ammoRemainCount == 0)
+		{
+
+			_ammoRemainCount = 30;
+			owner->Leftammo = _ammoRemainCount;
+			owner->Weapon1bullet -= 30;
+		}
+		else {
+			owner->Weapon1bullet += _ammoRemainCount;
+			_ammoRemainCount = 30;
+			owner->Leftammo = _ammoRemainCount;
+			owner->Weapon1bullet -= 30;
+		}
+		
 	}
 	else {
-		_ammoRemainCount = owner->Weapon1bullet;
-		owner->Leftammo = _ammoRemainCount;
-		owner->Weapon1bullet = 0;
+		if (_ammoRemainCount == 0)
+		{
+			_ammoRemainCount = owner->Weapon1bullet;
+			owner->Leftammo = _ammoRemainCount;
+			owner->Weapon1bullet = 0;
+		}
+		else {
+			if (_ammoRemainCount + owner->Weapon1bullet >= 30)
+			{
+				owner->Weapon1bullet += _ammoRemainCount;
+				_ammoRemainCount = 30;
+				owner->Leftammo = _ammoRemainCount;
+				owner->Weapon1bullet -= 30;
+			}
+			else
+			{
+				_ammoRemainCount += owner->Weapon1bullet;
+				owner->Leftammo = _ammoRemainCount;
+				owner->Weapon1bullet = 0;
+			}
+		}
 	}
 }
