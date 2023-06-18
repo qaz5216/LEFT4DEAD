@@ -46,7 +46,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 			FCollisionQueryParams collisionParams;
 			collisionParams.AddIgnoredActor(this);
 			//빨강선으로 확인용
-			DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1.0f);
+			//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1.0f);
 			if (GetWorld()->LineTraceSingleByChannel(
 				hitResult,
 				start,
@@ -58,7 +58,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 				{
 					auto* hitActor = hitResult.GetActor();
 					//뭐에맞았는지 확인용
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
+					//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
 					FVector projectiledirection = hitResult.Location - owner->RightMesh->GetSocketLocation("WeaponSocket");
 					UWorld* world = GetWorld();
 					if (world)
@@ -80,7 +80,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 								_ammoRemainCount--;
 								owner->Leftammo = _ammoRemainCount;
 								owner->ShakeCamerastart();
-								GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"),_ammoRemainCount));
+								//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"),_ammoRemainCount));
 							}
 						}
 					}
@@ -109,7 +109,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 							_ammoRemainCount--;
 							owner->Leftammo = _ammoRemainCount;
 							owner->ShakeCamerastart();
-							GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"), _ammoRemainCount));
+							//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("remain%d"), _ammoRemainCount));
 						}
 					}
 				}

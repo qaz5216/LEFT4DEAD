@@ -173,7 +173,7 @@ void AFPSCharacter::Tick(float DeltaTime)
 			{
 				auto* hitActor = hitResult.GetActor();
 				//뭐에맞았는지 확인용
-				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
+				//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
 			}
 		}
 		linedelaytime = 0;
@@ -225,10 +225,10 @@ void AFPSCharacter::MoveForward(float Value)
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
 	if (walking)
 	{
-		AddMovementInput(Direction*0.2, Value);
+		AddMovementInput(Direction*0.15, Value);
 	}
 	else
-	AddMovementInput(Direction*0.4, Value);
+	AddMovementInput(Direction*0.3, Value);
 }
 
 void AFPSCharacter::MoveRight(float Value)
@@ -236,10 +236,10 @@ void AFPSCharacter::MoveRight(float Value)
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 	if (walking)
 	{
-		AddMovementInput(Direction * 0.2, Value);
+		AddMovementInput(Direction * 0.15, Value);
 	}
 	else
-	AddMovementInput(Direction * 0.4, Value);
+	AddMovementInput(Direction * 0.3, Value);
 }
 
 void AFPSCharacter::StartJump()
@@ -371,7 +371,7 @@ void AFPSCharacter::Reload()
 	{
 		if (equip_weapon!=nullptr)
 		{
-			if (Weapon1bullet!=0)
+			if (Weapon1bullet!=0&&Leftammo!=30)
 			{
 				reloading = true;
 				reloadtime = 0;
@@ -548,7 +548,7 @@ void AFPSCharacter::Interaction()
 		{
 			auto* hitActor = hitResult.GetActor();
 			//뭐에맞았는지 확인용
-			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
+			//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, FString::Printf(TEXT("Hit Actor Name:%s"), *hitActor->GetName()));
 			AWeapon* HitWeapon = Cast<AWeapon>(hitActor);
 			if (HitWeapon!=nullptr)
 			{
