@@ -170,4 +170,13 @@ public:
 	UPROPERTY()
 	UAnimationAsset* ReloadAinm;
 	FTimerHandle shakehandle;
+	//상호작용 물체확인코드 (상호작용가능클래스는 weapon클래스임)
+	UFUNCTION()
+		bool IsAssaultRifle(AWeapon* HitWeapon);
+	UFUNCTION()
+		bool IsHealPack(AWeapon* HitWeapon);
+	UFUNCTION()
+		bool IsAmmoPack(AWeapon* HitWeapon);
+	UFUNCTION()
+		bool IsElevator(AWeapon* HitWeapon);
 };

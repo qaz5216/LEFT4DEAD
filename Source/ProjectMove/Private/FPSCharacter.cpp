@@ -8,6 +8,7 @@
 #include "AssaultRifle.h"
 #include "AmmoPack.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Elevator.h"
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -551,52 +552,102 @@ void AFPSCharacter::Interaction()
 			AWeapon* HitWeapon = Cast<AWeapon>(hitActor);
 			if (HitWeapon!=nullptr)
 			{
-				AHillPack* isHillPack = Cast<AHillPack>(HitWeapon);
-				if (isHillPack != nullptr)
+				if (IsHealPack(HitWeapon)) // 힐팩이면
 				{
-					hitActor->Destroy();
-					HillPackNum++;
+					AHillPack* isHillPack = Cast<AHillPack>(HitWeapon);
+					if (isHillPack != nullptr)
+					{
+						hitActor->Destroy();
+						HillPackNum++;
+					}
 				}
-				else
+				else if (IsAmmoPack(HitWeapon)) //탄약통이면
 				{
 					AAmmoPack* isAmmoPack = Cast<AAmmoPack>(HitWeapon);
 					if (isAmmoPack != nullptr) {
 						Weapon1bullet = 180;
 					}
-					else
+				}
+				else if(IsAssaultRifle(HitWeapon)) // ar소총이면
+				{
+					AAssaultRifle* isAssaultRifle = Cast<AAssaultRifle>(HitWeapon);
+					if (isAssaultRifle != nullptr)
 					{
-						AAssaultRifle* isAssaultRifle = Cast<AAssaultRifle>(HitWeapon);
-						if (isAssaultRifle != nullptr)
+						if (equip_weapon != nullptr)
 						{
-							if (equip_weapon != nullptr)
+							if (Weapon1bullet + Leftammo >= 180)
 							{
-								if (Weapon1bullet + Leftammo >= 180)
-								{
-									Weapon1bullet = 180;
-								}
-								else
-								{
-									Weapon1bullet += Leftammo;
+								Weapon1bullet = 180;
+							}
+							else
+							{
+								Weapon1bullet += Leftammo;
 
-								}
-								Leftammo = 0;
-								equip_weapon->Destroy();
-								equip_weapon = nullptr;
 							}
-							equip_weapon = isAssaultRifle;
-							Leftammo = 30;
-							const USkeletalMeshSocket* weaponSocket = RightMesh->GetSocketByName("WeaponSocket");
-							if (equip_weapon != nullptr && weaponSocket)
-							{
-								weaponSocket->AttachActor(equip_weapon, RightMesh);
-							}
+							Leftammo = 0;
+							equip_weapon->Destroy();
+							equip_weapon = nullptr;
+						}
+						equip_weapon = isAssaultRifle;
+						Leftammo = 30;
+						const USkeletalMeshSocket* weaponSocket = RightMesh->GetSocketByName("WeaponSocket");
+						if (equip_weapon != nullptr && weaponSocket)
+						{
+							weaponSocket->AttachActor(equip_weapon, RightMesh);
 						}
 					}
+				}
+				else if (IsElevator(HitWeapon)) //엘베버튼이면
+				{
+					AElevator* elevatorbutton = Cast<AElevator>(HitWeapon);
+					elevatorbutton->ispress = true;
+					UE_LOG(LogTemp, Log, TEXT("%s"), elevatorbutton->ispress);
 				}
 			}
 		}
 	}
 }
+
+//상호작용 오브젝트 검증
+
+bool AFPSCharacter::IsAssaultRifle(AWeapon* HitWeapon)
+{
+	AAssaultRifle* isAssaultRifle = Cast<AAssaultRifle>(HitWeapon);
+	if (isAssaultRifle != nullptr)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool AFPSCharacter::IsHealPack(AWeapon* HitWeapon)
+{
+	AHillPack* isHillPack = Cast<AHillPack>(HitWeapon);
+	if (isHillPack!=nullptr)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool AFPSCharacter::IsAmmoPack(AWeapon* HitWeapon)
+{
+	AAmmoPack* isAmmoPack = Cast<AAmmoPack>(HitWeapon);
+	if (isAmmoPack != nullptr) {
+		return true;
+	}
+	return false;
+}
+
+bool AFPSCharacter::IsElevator(AWeapon* HitWeapon)
+{
+	AElevator* isElevator = Cast<AElevator>(HitWeapon);
+	if (isElevator != nullptr) {
+		return true;
+	}
+	return false;
+}
+
 
 
 
