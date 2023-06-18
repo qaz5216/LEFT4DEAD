@@ -5,7 +5,15 @@
 
 AElevator::AElevator()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	
 	ispress = false;
+}
+
+void AElevator::pressing()
+{
+	ispress = true;
+	if (ispress)
+	{
+		UE_LOG(LogTemp, Log, TEXT("pressing"));
+	}
 }

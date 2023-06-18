@@ -228,7 +228,7 @@ void AFPSCharacter::MoveForward(float Value)
 		AddMovementInput(Direction*0.15, Value);
 	}
 	else
-	AddMovementInput(Direction*0.3, Value);
+	AddMovementInput(Direction*1, Value);
 }
 
 void AFPSCharacter::MoveRight(float Value)
@@ -239,7 +239,7 @@ void AFPSCharacter::MoveRight(float Value)
 		AddMovementInput(Direction * 0.15, Value);
 	}
 	else
-	AddMovementInput(Direction * 0.3, Value);
+	AddMovementInput(Direction * 1, Value);
 }
 
 void AFPSCharacter::StartJump()
@@ -600,8 +600,8 @@ void AFPSCharacter::Interaction()
 				else if (IsElevator(HitWeapon)) //엘베버튼이면
 				{
 					AElevator* elevatorbutton = Cast<AElevator>(HitWeapon);
-					elevatorbutton->ispress = true;
-					UE_LOG(LogTemp, Log, TEXT("%s"), elevatorbutton->ispress);
+					elevatorbutton->pressing();
+					//elevatorbutton->ispress = true;
 				}
 			}
 		}

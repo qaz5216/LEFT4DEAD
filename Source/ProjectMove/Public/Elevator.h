@@ -17,4 +17,6 @@ public:
 	AElevator();
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Weapon)
 		bool ispress;
+
+	void pressing();
 };
