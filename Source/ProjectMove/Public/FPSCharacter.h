@@ -179,4 +179,8 @@ public:
 		bool IsAmmoPack(AWeapon* HitWeapon);
 	UFUNCTION()
 		bool IsElevator(AWeapon* HitWeapon);
+
+	//ÃÑ±¸À§Ä¡
+	UPROPERTY(EditAnywhere, Category = Socket)
+		UStaticMeshComponent* fireloc;
 };

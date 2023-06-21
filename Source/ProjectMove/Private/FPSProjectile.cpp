@@ -2,6 +2,8 @@
 
 
 #include "FPSProjectile.h"
+#include <Kismet/GameplayStatics.h>
+#include <GameFramework/Character.h>
 
 // Sets default values
 AFPSProjectile::AFPSProjectile()
@@ -28,6 +30,7 @@ AFPSProjectile::AFPSProjectile()
 	//3초만 살아있음
 	CollisionComponent->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
 	CollisionComponent->OnComponentHit.AddDynamic(this, &AFPSProjectile::OnHit);
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AFPSProjectile::OnComponentBeginOverlap);
 }
 
 // Called when the game starts or when spawned
@@ -51,8 +54,27 @@ void AFPSProjectile::FireInDirection(const FVector&ShootDirection)
 
 void AFPSProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionFactory,GetActorLocation(), FRotator(), FVector(1, 1, 1));
+	UE_LOG(LogTemp, Log, TEXT("block"));
 	if (OtherActor != this && OtherComponent->IsSimulatingPhysics())
 	{
 		OtherComponent->AddImpulseAtLocation(ProjectileMovementComponent->Velocity * 100.0f, Hit.ImpactPoint);
 	}
+}
+
+void AFPSProjectile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Log, TEXT("overlap"));
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BloodFactory, GetActorLocation(), FRotator(), FVector(1, 1, 1));
+	Destroy();
+}
+
+bool AFPSProjectile::IsCharacter(AActor* checkActor)
+{
+	/*Character* Character = Cast<ACharacter>(checkActor);
+	if (Character != nullptr)
+	{
+		return true;
+	}*/
+	return false;
 }

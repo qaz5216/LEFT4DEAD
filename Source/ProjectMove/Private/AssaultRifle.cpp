@@ -4,6 +4,7 @@
 #include "AssaultRifle.h"
 #include "FPSCharacter.h"
 #include "FPSProjectile.h"
+#include <Kismet/GameplayStatics.h>
 void AAssaultRifle::StartFire(AFPSCharacter* owner)
 {
 	if (owner)
@@ -73,6 +74,8 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 							projectile->SetActorLocation(owner->RightMesh->GetSocketLocation("WeaponSocket"));
 							if (projectiledirection.Normalize())
 							{
+								projectiledirection.Normalize();
+								UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionFactory, owner->RightMesh->GetSocketLocation("WeaponSocket") + projectiledirection * 60,FRotator(),FVector(1,1,1));
 								projectile->FireInDirection(projectiledirection);
 								projectile->SetLifeSpan(3.0f);
 								projectile->ProjectileMovementComponent->InitialSpeed = 3000.0f;

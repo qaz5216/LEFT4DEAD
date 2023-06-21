@@ -38,5 +38,14 @@ public:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	UPROPERTY(EditDefaultsOnly, Category="Blood")
+	class UParticleSystem* BloodFactory;
 
+	UPROPERTY(EditDefaultsOnly, Category="Explosion")
+	class UParticleSystem* explosionFactory;
+
+	UFUNCTION()
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	bool IsCharacter(AActor* checkActor);
 };

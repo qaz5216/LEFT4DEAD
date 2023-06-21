@@ -28,4 +28,7 @@ class PROJECTMOVE_API AAssaultRifle : public AWeapon
 		
 		UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AFPSProjectile> ProjectileClass;
+
+		UPROPERTY(EditDefaultsOnly, Category="Explosion")
+		class UParticleSystem* explosionFactory;
 };

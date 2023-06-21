@@ -40,7 +40,9 @@ AFPSCharacter::AFPSCharacter()
 	RightMesh->SetRelativeLocation(FVector(0.0f, 10.0f, -210.0f));
 	RightMesh->SetRelativeRotation(FRotator(0.0, -100.0, 0.0));
 	RightMesh->SetWorldScale3D(FVector(1.75, 1.45, 1.25));
-	
+	fireloc = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("fireloc"));
+	fireloc->SetupAttachment(RightMesh);
+	fireloc->SetRelativeLocation(FVector(-10.0f, 80.0f, 160.0f));
 	//처음 웨폰 1
 	WeaponNum = 1;
 	Ammo = 30;
