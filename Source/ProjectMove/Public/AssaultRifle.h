@@ -31,4 +31,7 @@ class PROJECTMOVE_API AAssaultRifle : public AWeapon
 
 		UPROPERTY(EditDefaultsOnly, Category="Explosion")
 		class UParticleSystem* explosionFactory;
+
+		UPROPERTY(EditDefaultsOnly)
+		USoundBase* FireSound;
 };

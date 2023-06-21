@@ -65,16 +65,21 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 void AFPSProjectile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Log, TEXT("overlap"));
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BloodFactory, GetActorLocation(), FRotator(), FVector(1, 1, 1));
+	if (IsCharacter(OtherActor)) {
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BloodFactory, GetActorLocation(), FRotator(), FVector(0.3, 0.3, 0.2));
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("no C"));
+	}
 	Destroy();
 }
 
 bool AFPSProjectile::IsCharacter(AActor* checkActor)
 {
-	/*Character* Character = Cast<ACharacter>(checkActor);
+	ACharacter* Character = Cast<ACharacter>(checkActor);
 	if (Character != nullptr)
 	{
 		return true;
-	}*/
+	}
 	return false;
 }
