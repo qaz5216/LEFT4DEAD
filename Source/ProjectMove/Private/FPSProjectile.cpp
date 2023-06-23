@@ -66,6 +66,7 @@ void AFPSProjectile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 {
 	UE_LOG(LogTemp, Log, TEXT("overlap"));
 	if (IsCharacter(OtherActor)) {
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HittedSound, GetActorLocation());
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BloodFactory, GetActorLocation(), FRotator(), FVector(0.3, 0.3, 0.2));
 	}
 	else {

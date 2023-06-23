@@ -48,4 +48,7 @@ public:
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	bool IsCharacter(AActor* checkActor);
+
+	UPROPERTY(EditDefaultsOnly)
+		USoundBase* HittedSound;
 };
