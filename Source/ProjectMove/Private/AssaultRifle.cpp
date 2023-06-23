@@ -107,6 +107,7 @@ void AAssaultRifle::FireWithLineTrace(class AFPSCharacter* owner)
 						if (projectiledirection.Normalize())
 						{
 							projectile->FireInDirection(projectiledirection);
+							UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, owner->RightMesh->GetSocketLocation("WeaponSocket") + projectiledirection * 60);
 							UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionFactory, owner->RightMesh->GetSocketLocation("WeaponSocket") + projectiledirection * 60, FRotator(), FVector(1, 1, 1));
 							projectile->SetLifeSpan(3.0f);
 							projectile->ProjectileMovementComponent->InitialSpeed = 3000.0f;

@@ -183,4 +183,11 @@ public:
 	//ÃÑ±¸À§Ä¡
 	UPROPERTY(EditAnywhere, Category = Socket)
 		UStaticMeshComponent* fireloc;
+
+	UPROPERTY(EditDefaultsOnly)
+		USoundBase* EquipSound;
+	UPROPERTY(EditDefaultsOnly)
+		USoundBase* InteractionSound;
+	UPROPERTY(EditDefaultsOnly)
+		USoundBase* ReloadSound;
 };

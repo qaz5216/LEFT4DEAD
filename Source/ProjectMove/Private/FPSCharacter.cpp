@@ -9,6 +9,7 @@
 #include "AmmoPack.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Elevator.h"
+#include <Kismet/GameplayStatics.h>
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -380,6 +381,7 @@ void AFPSCharacter::Reload()
 				if (ReloadAinm != nullptr)
 				{
 					RightMesh->PlayAnimation(ReloadAinm, false);
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, RightMesh->GetSocketLocation("WeaponSocket"));
 				}
 			}
 		}
@@ -561,6 +563,7 @@ void AFPSCharacter::Interaction()
 					{
 						hitActor->Destroy();
 						HillPackNum++;
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), InteractionSound, RightMesh->GetSocketLocation("WeaponSocket"));
 					}
 				}
 				else if (IsAmmoPack(HitWeapon)) //탄약통이면
@@ -568,6 +571,7 @@ void AFPSCharacter::Interaction()
 					AAmmoPack* isAmmoPack = Cast<AAmmoPack>(HitWeapon);
 					if (isAmmoPack != nullptr) {
 						Weapon1bullet = 180;
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), InteractionSound, RightMesh->GetSocketLocation("WeaponSocket"));
 					}
 				}
 				else if(IsAssaultRifle(HitWeapon)) // ar소총이면
@@ -596,13 +600,16 @@ void AFPSCharacter::Interaction()
 						if (equip_weapon != nullptr && weaponSocket)
 						{
 							weaponSocket->AttachActor(equip_weapon, RightMesh);
+							UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquipSound, RightMesh->GetSocketLocation("WeaponSocket"));
 						}
+
 					}
 				}
 				else if (IsElevator(HitWeapon)) //엘베버튼이면
 				{
 					AElevator* elevatorbutton = Cast<AElevator>(HitWeapon);
 					elevatorbutton->pressing();
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), InteractionSound, RightMesh->GetSocketLocation("WeaponSocket"));
 					//elevatorbutton->ispress = true;
 				}
 			}
