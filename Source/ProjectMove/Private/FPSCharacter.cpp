@@ -9,6 +9,7 @@
 #include "AmmoPack.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Elevator.h"
+#include <Kismet/GameplayStatics.h>
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -380,6 +381,7 @@ void AFPSCharacter::Reload()
 				if (ReloadAinm != nullptr)
 				{
 					RightMesh->PlayAnimation(ReloadAinm, false);
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, RightMesh->GetSocketLocation("WeaponSocket"));
 				}
 			}
 		}
@@ -559,6 +561,7 @@ void AFPSCharacter::Interaction()
 					AHillPack* isHillPack = Cast<AHillPack>(HitWeapon);
 					if (isHillPack != nullptr)
 					{
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), InteractionSound, RightMesh->GetSocketLocation("WeaponSocket"));
 						hitActor->Destroy();
 						HillPackNum++;
 					}
@@ -567,6 +570,7 @@ void AFPSCharacter::Interaction()
 				{
 					AAmmoPack* isAmmoPack = Cast<AAmmoPack>(HitWeapon);
 					if (isAmmoPack != nullptr) {
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), InteractionSound, RightMesh->GetSocketLocation("WeaponSocket"));
 						Weapon1bullet = 180;
 					}
 				}
@@ -596,6 +600,7 @@ void AFPSCharacter::Interaction()
 						if (equip_weapon != nullptr && weaponSocket)
 						{
 							weaponSocket->AttachActor(equip_weapon, RightMesh);
+							UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquipSound, RightMesh->GetSocketLocation("WeaponSocket"));
 						}
 					}
 				}
