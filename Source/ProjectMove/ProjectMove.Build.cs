@@ -8,7 +8,11 @@ public class ProjectMove : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
+<<<<<<< HEAD
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" ,"UMG"});
+=======
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

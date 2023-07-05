@@ -2,6 +2,7 @@
 
 #include "FPSCharacter.h"
 #include "Camera/CameraComponent.h"
+<<<<<<< HEAD
 #include "FPSProjectile.h"
 #include "GameFramework/Character.h"
 #include "HillPack.h"
@@ -10,6 +11,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Elevator.h"
 #include <Kismet/GameplayStatics.h>
+=======
+#include "GameFramework/Character.h"
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -25,6 +29,7 @@ AFPSCharacter::AFPSCharacter()
     FPSCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
     // 폰의 로테이션 제어를 허가합니다.
     FPSCameraComponent->bUsePawnControlRotation = true;
+<<<<<<< HEAD
 	// 소켓메쉬 입니다.
 	
 	// 일인칭 메시 컴포넌트입니다.
@@ -69,6 +74,21 @@ AFPSCharacter::AFPSCharacter()
 	}
 	linedelaytime = 0;
 	GetCharacterMovement()->JumpZVelocity = GetCharacterMovement()->JumpZVelocity*0.6;
+=======
+	
+	// 일인칭 메시 컴포넌트입니다.
+	FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
+	// 소유 플레이어만 이 메시를 볼 수 있습니다.
+	FPSMesh->SetOnlyOwnerSee(true);
+	// FPS 메시를 FPS 카메라에 붙입니다.
+	FPSMesh->SetupAttachment(FPSCameraComponent);
+	// 일부 환경 섀도잉을 꺼 메시가 하나인 듯 보이는 느낌을 유지합니다.
+	FPSMesh->bCastDynamicShadow = false;
+	FPSMesh->CastShadow = false;
+
+	GetMesh()->SetOwnerNoSee(true);
+
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 }
 
 // Called when the game starts or when spawned
@@ -79,18 +99,23 @@ void AFPSCharacter::BeginPlay()
 	{
 		// 5 초간 디버그 메시지를 표시합니다. (첫 인수인) -1 "Key" 값은 이 메시지를 업데이트 또는 새로고칠 필요가 없음을 나타냅니다.
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
+<<<<<<< HEAD
 		
 		AttachWeapon(_weapon);
 		equip_weapon->Destroy();
 		equip_weapon = nullptr;
 	}
 	HillPackNum = 0;
+=======
+	}
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 }
 
 // Called every frame
 void AFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+<<<<<<< HEAD
 	if (firing) {
 		currentTime += DeltaTime;
 		if (currentTime >= firetime) {
@@ -181,6 +206,8 @@ void AFPSCharacter::Tick(float DeltaTime)
 		}
 		linedelaytime = 0;
 	}
+=======
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 
 }
 
@@ -196,6 +223,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//Look바인딩 구성
 	PlayerInputComponent->BindAxis("Turn", this, &AFPSCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AFPSCharacter::AddControllerPitchInput);
+<<<<<<< HEAD
 	//"action"바인딩 구성
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
@@ -220,29 +248,43 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Interaction", IE_Released, this, &AFPSCharacter::Interaction);
 	//힐링 임시
 	PlayerInputComponent->BindAction("Healing", IE_Released, this, &AFPSCharacter::Heal);
+=======
+
+	//"action"바인딩 구성
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 }
 
 void AFPSCharacter::MoveForward(float Value)
 {
 	//어느쪽이 전방인지 알아내어 플레이어가 그방향으로 이동하고자 한다고 기록합니다.
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+<<<<<<< HEAD
 	if (walking)
 	{
 		AddMovementInput(Direction*0.15, Value);
 	}
 	else
 	AddMovementInput(Direction*0.3, Value);
+=======
+	AddMovementInput(Direction, Value);
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 }
 
 void AFPSCharacter::MoveRight(float Value)
 {
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
+<<<<<<< HEAD
 	if (walking)
 	{
 		AddMovementInput(Direction * 0.15, Value);
 	}
 	else
 	AddMovementInput(Direction * 0.3, Value);
+=======
+	AddMovementInput(Direction, Value);
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 }
 
 void AFPSCharacter::StartJump()
@@ -253,6 +295,7 @@ void AFPSCharacter::StartJump()
 void AFPSCharacter::StopJump()
 {
 	bPressedJump = false;
+<<<<<<< HEAD
 }
 
 void AFPSCharacter::Fire()
@@ -667,4 +710,6 @@ void AFPSCharacter::Logiccheck()
 {
 	equip_weapon->Destroy();
 	equip_weapon = nullptr;
+=======
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 }

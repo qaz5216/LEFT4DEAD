@@ -9,9 +9,13 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
+<<<<<<< HEAD
 				"Engine",
 				"GameplayCameras",
 				"UMG"
+=======
+				"Engine"
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 			]
 		}
 	],
@@ -22,6 +26,7 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+<<<<<<< HEAD
 		},
 		{
 			"Name": "AlembicHairImporter",
@@ -34,6 +39,8 @@
 		{
 			"Name": "UdpMessaging",
 			"Enabled": false
+=======
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 		}
 	]
 }

@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+<<<<<<< HEAD
 #include "Engine/SkeletalMeshSocket.h"
 #include "Weapon.h"
 #include "FPSCharacter.generated.h"
 
+=======
+#include "FPSCharacter.generated.h"
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 UCLASS()
 class PROJECTMOVE_API AFPSCharacter : public ACharacter
 {
@@ -21,7 +25,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+<<<<<<< HEAD
 public:
+=======
+public:	
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -29,6 +37,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
+<<<<<<< HEAD
 		void MoveForward(float Value);
 
 	// 좌우 이동 처리
@@ -190,4 +199,27 @@ public:
 		USoundBase* InteractionSound;
 	UPROPERTY(EditDefaultsOnly)
 		USoundBase* ReloadSound;
+=======
+	void MoveForward(float Value);
+
+	// 좌우 이동 처리
+	UFUNCTION()
+	void MoveRight(float Value);
+
+	UFUNCTION()
+	void StartJump();
+
+	// 좌우 이동 처리
+	UFUNCTION()
+	void StopJump();
+
+	//FPS카메라
+	UPROPERTY(VisibleAnywhere)
+	class UCameraComponent* FPSCameraComponent;
+
+	// 일인칭 메시 (팔), 소유 플레이어에게만 보입니다.
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* FPSMesh;
+
+>>>>>>> 870a3e3f6533c4750aed33d3b5423556b891871d
 };
